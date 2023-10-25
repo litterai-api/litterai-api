@@ -6,10 +6,13 @@ import { getUserCollection } from '../../DB/collections.js';
 import logError from '../../Errors/log-error.js';
 import createUserPhotoDoc from './helpers.js';
 
+/**
+ * @type {import('mongodb').Collection}
+ */
+const userCollection = getUserCollection;
+
 const { JWT_SECRET } = process.env;
 const __filename = fileURLToPath(import.meta.url);
-
-const userCollection = getUserCollection;
 
 const registerUser = async (body) => {
   let { username, email, firstName, lastName } = body;
