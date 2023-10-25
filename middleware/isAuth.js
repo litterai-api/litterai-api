@@ -53,6 +53,7 @@ const isAuth = async (req, res, next) => {
   try {
     decodedToken = jwt.verify(authToken, JWT_SECRET);
   } catch (err) {
+    console.log(err);
     return res.status(401).send({ message: 'Unauthorized' });
   }
 
