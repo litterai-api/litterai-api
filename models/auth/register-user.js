@@ -55,8 +55,9 @@ const registerUser = async (body) => {
     console.log('INSERTED THING: ', insertResult);
     const token = jwt.sign(
       {
-        userId: insertResult.insertedId.toHexString(),
+        _id: insertResult.insertedId.toHexString(),
         username,
+        email,
       },
       JWT_SECRET,
       { expiresIn: '7d' },
