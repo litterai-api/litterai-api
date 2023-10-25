@@ -4,7 +4,10 @@ import authModel from '../../models/auth/index.js';
 import { registerSchema } from './authReqBodySchemas.js';
 
 const __filename = fileURLToPath(import.meta.url);
-
+/**
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 const postRegister = async (req, res) => {
   try {
     const { error } = registerSchema.validate(req.body);
