@@ -3,7 +3,7 @@
     "browser": true,
     "es2021": true
   },
-  "extends": "airbnb-base",
+  "extends": ["airbnb-base"],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module"
@@ -11,6 +11,8 @@
   "rules": {
     "import/extensions": ["error", "ignorePackages"],
     "no-console": "off",
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "operator-linebreak": "off",
+    "object-curly-newline": "off"
   }
 }

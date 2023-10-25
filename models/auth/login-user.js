@@ -1,14 +1,10 @@
 import { fileURLToPath } from 'url';
 
-import {
-  getUserCollection,
-  getCatCountCollection,
-} from '../../DB/collections.js';
+import { getUserCollection } from '../../DB/collections.js';
 import logError from '../../Errors/log-error.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const users = getUserCollection;
-const catCounts = getCatCountCollection;
 
 const loginUser = async () => {
   try {

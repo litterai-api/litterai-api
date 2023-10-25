@@ -6,6 +6,7 @@ import { getDb } from './db-connection.js';
 let userCollection;
 let uploadCollection;
 let categoryCountCollection;
+let blacklistCollection;
 
 const getCollection = async (collectionName, collection) => {
   if (collection) {
@@ -28,4 +29,8 @@ export const getUploadInfoCollection = await getCollection(
 export const getCatCountCollection = await getCollection(
   'categoryCounts',
   categoryCountCollection,
+);
+export const getBlacklistCollection = await getCollection(
+  'blacklistTokens',
+  blacklistCollection,
 );
