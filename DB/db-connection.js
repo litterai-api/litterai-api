@@ -8,7 +8,7 @@ export const mongoConnect = async () => {
   try {
     console.log(process.env.MONGO_URI);
     const client = await MongoClient.connect(process.env.MONGO_URI);
-    _db = client.db('leaderboard');
+    _db = client.db('litterai-api');
   } catch (error) {
     console.log(error);
     throw error;
