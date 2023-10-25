@@ -12,7 +12,9 @@ const __filename = fileURLToPath(import.meta.url);
  */
 
 const postPhoto = async (req, res) => {
-  const { category, email } = req.body;
+  let { category, email } = req.body;
+  category = category.toLowerCase()
+  email = email.toLowerCase()
   try {
     const { error } = postPhotoBodySchema.validate(req.body);
     if (error) {
