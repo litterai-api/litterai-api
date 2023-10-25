@@ -24,7 +24,6 @@ const isAuth = async (req, res, next) => {
   const authTokenSchema = Joi.string().pattern(/^Bearer /);
 
   const authHeader = req.get('Authorization');
-  console.log(authHeader);
   if (!authHeader) {
     return res.status(422).send({
       message: 'Authentication token is required for this endpoint.',

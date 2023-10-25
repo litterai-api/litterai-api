@@ -23,7 +23,7 @@ const getCollection = async (collectionName, collection) => {
 
 export const getUserCollection = await getCollection('users', userCollection);
 export const getUploadInfoCollection = await getCollection(
-  'uploads',
+  'uploadsinfo',
   uploadCollection,
 );
 export const getCatCountCollection = await getCollection(

@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'url';
+import jwt from 'jsonwebtoken';
 
 import { getUserCollection } from '../../DB/collections.js';
 import logError from '../../Errors/log-error.js';
@@ -8,6 +9,7 @@ import logError from '../../Errors/log-error.js';
 const usersCollection = getUserCollection;
 
 const __filename = fileURLToPath(import.meta.url);
+const { JWT_SECRET } = process.env;
 
 const loginUser = async () => {
   try {
@@ -16,6 +18,16 @@ const loginUser = async () => {
       // send back correct code and a message
       return { code: 'someNumber', data: { message: 'Some Text' } };
     }
+    // When signing token include _id as a string, username, and email
+    // const token = jwt.sign(
+    //   {
+    //     _id:
+    //     username:
+    //     email:
+    //   },
+    //   JWT_SECRET,
+    //   { expiresIn: '7d' },
+    // );
     return { code: 'someNumber', data: { message: 'Some Text' } };
   } catch (error) {
     logError(error, __filename, 'loginUser');
