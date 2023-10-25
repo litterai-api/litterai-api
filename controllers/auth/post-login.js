@@ -5,7 +5,10 @@ import { loginSchema } from './authReqBodySchemas.js';
 import logError from '../../Errors/log-error.js';
 
 const __filename = fileURLToPath(import.meta.url);
-
+/**
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 const postLogin = async (req, res) => {
   try {
     const { error } = loginSchema.validate(req.body);

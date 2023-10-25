@@ -2,9 +2,12 @@ import { fileURLToPath } from 'url';
 
 import { getBlacklistCollection } from '../../DB/collections.js';
 import logError from '../../Errors/log-error.js';
+/**
+ * @type {import('mongodb').Collection}
+ */
+const blacklistCollection = getBlacklistCollection;
 
 const __filename = fileURLToPath(import.meta.url);
-const blacklistCollection = getBlacklistCollection;
 
 const logoutUser = async () => {
   try {

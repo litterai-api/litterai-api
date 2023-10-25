@@ -2,13 +2,16 @@ import { fileURLToPath } from 'url';
 
 import { getUserCollection } from '../../DB/collections.js';
 import logError from '../../Errors/log-error.js';
+/**
+ * @type {import('mongodb').Collection}
+ */
+const usersCollection = getUserCollection;
 
 const __filename = fileURLToPath(import.meta.url);
-const users = getUserCollection;
 
 const loginUser = async () => {
   try {
-    const userDoc = users.findOne();
+    const userDoc = usersCollection.findOne();
     if (userDoc) {
       // send back correct code and a message
       return { code: 'someNumber', data: { message: 'Some Text' } };
