@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { getDb, mongoConnect } from './DB/db-connection.js';
 import routes from './routes/index.js';
 import logError from './Errors/log-error.js';
+import isAuth from './middleware/isAuth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -24,7 +25,8 @@ const startServer = async () => {
 
     // Routes
     app.use('/', routes.auth);
-
+    app.use(isAuth);
+    app.use('/photo', routes.photo);
     app.listen(PORT, () => {
       console.log(
         `Server started on port: ${PORT}\nConnected to db: ${db.databaseName}`,
