@@ -13,9 +13,9 @@ const __filename = fileURLToPath(import.meta.url);
 const { JWT_SECRET } = process.env;
 
 const loginUser = async (body) => {
-  let { email } = body;
-  const { password } = body;
-  email = email.toLowerCase();
+  let { email, password } = body;
+  email = email.toLowerCase().trim();
+  password = password.trim();
   try {
     const userDoc = await usersCollection.findOne({ email });
     console.log('userDoc: ', userDoc);
@@ -39,7 +39,8 @@ const loginUser = async (body) => {
       JWT_SECRET,
       { expiresIn: '7d' },
     );
-    return { code: 201,
+    return {
+      code: 201,
       data: {
         username: userDoc.username,
         email: userDoc.email,
