@@ -3,6 +3,7 @@ import Joi from 'joi';
 export const registerSchema = Joi.object({
   username: Joi.string().required(),
   password: Joi.string().required().min(6).max(32),
+  confirmPassword: Joi.any().valid(Joi.ref('password')).required(),
   email: Joi.string().email().required(),
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
@@ -15,4 +16,3 @@ export const loginSchema = Joi.object({
 });
 
 export const authTokenSchema = Joi.string().pattern(/^Bearer /);
-

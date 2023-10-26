@@ -12,6 +12,13 @@ const postRegister = async (req, res) => {
   try {
     const { error } = registerSchema.validate(req.body);
     if (error) {
+      console.log(error);
+      if (error.message === '"confirmPassword" must be [ref:password]') {
+        return res.status(422).send({
+          message: 'Validation Error',
+          error: 'Passwords must match',
+        });
+      }
       return res
         .status(422)
         .send({ message: 'Validation Error', error: error.details[0].message });

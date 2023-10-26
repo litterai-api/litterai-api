@@ -10,14 +10,14 @@ const postLogout = async (req, res) => {
   try {
     const authHeader = req.get('Authorization');
     const token = authHeader.split(' ')[1];
-    console.log(blacklistCollection);
-    const result = await blacklistCollection.insertOne({
+
+    await blacklistCollection.insertOne({
       token,
       username: req.user.username,
       createdAt: Date.now(),
     });
 
-    return res.status(201).send({ message: 'Logged out' });
+    return res.status(201).send({ message: 'Logged out user' });
   } catch (error) {
     console.error(error);
     logError(error, __filename, 'postLogout');
