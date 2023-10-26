@@ -56,7 +56,7 @@ const registerUser = async (body) => {
       };
     }
 
-    await createUserPhotoDoc(insertResult.insertedId, username, email);
+    await createUserPhotoDoc(insertResult.insertedId, displayUsername, email);
     console.log('INSERTED THING: ', insertResult);
     const token = jwt.sign(
       {
