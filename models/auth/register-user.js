@@ -16,7 +16,7 @@ const __filename = fileURLToPath(import.meta.url);
 
 const registerUser = async (body) => {
   let { username, email, firstName, lastName } = body;
-  const { password, zipcode } = body;
+  const { password, zipCode } = body;
   const displayUsername = username;
   username = username.toLowerCase();
   email = email.toLowerCase();
@@ -37,10 +37,10 @@ const registerUser = async (body) => {
       username,
       displayUsername,
       email,
-      hashedPassword,
+      password: hashedPassword,
       firstName,
       lastName,
-      zipcode,
+      zipCode,
     };
     const insertResult = await userCollection.insertOne(payload);
 
@@ -66,12 +66,12 @@ const registerUser = async (body) => {
     return {
       code: 201,
       data: {
-        id: insertResult.insertedId.toHexString(),
+        _id: insertResult.insertedId.toHexString(),
         username: displayUsername,
         email,
         firstName,
         lastName,
-        zipcode,
+        zipCode,
         token,
       },
     };

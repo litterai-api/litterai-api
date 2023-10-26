@@ -38,9 +38,10 @@ const isAuth = async (req, res, next) => {
   }
 
   const authToken = authHeader.split(' ')[1];
+  const isBlacklisted = await blacklistCollection.findOne({ token: authToken });
 
   try {
-    if (await blacklistCollection.findOne({ token: authToken })) {
+    if (isBlacklisted) {
       return res.status(498).send({ message: 'Invalid Token' });
     }
   } catch (err) {

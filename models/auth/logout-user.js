@@ -11,6 +11,9 @@ const __filename = fileURLToPath(import.meta.url);
 
 const logoutUser = async () => {
   try {
+
+
+
   } catch (error) {
     logError(error, __filename, 'loginUser');
     console.log(error);

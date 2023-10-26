@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'url';
 
-// import authModel from '../../models/auth/index.js';
+import authModel from '../../models/auth/index.js';
 import { loginSchema } from './authReqBodySchemas.js';
 import logError from '../../Errors/log-error.js';
 
@@ -17,7 +17,8 @@ const postLogin = async (req, res) => {
         .status(422)
         .send({ message: 'Validation Error', error: error.details[0].message });
     }
-    return res.status().send();
+    const { code, data } = await authModel.login(req.body);
+    return res.status(code).send(data);
   } catch (error) {
     console.error(error);
     logError(error, __filename, 'postLogin');
