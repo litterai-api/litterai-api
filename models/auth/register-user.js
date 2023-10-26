@@ -15,13 +15,18 @@ const { JWT_SECRET } = process.env;
 const __filename = fileURLToPath(import.meta.url);
 
 const registerUser = async (body) => {
-  let { username, email, firstName, lastName } = body;
-  const { password, zipCode } = body;
+  let { username, email, firstName, lastName, password } = body;
+  const { zipCode } = body;
   const displayUsername = username;
-  username = username.toLowerCase();
-  email = email.toLowerCase();
-  firstName = `${firstName[0].toUpperCase()}${firstName.substring(1)}`;
-  lastName = `${lastName[0].toUpperCase()}${lastName.substring(1)}`;
+  username = username.toLowerCase().trim();
+  email = email.toLowerCase().trim();
+  password = password.trim();
+  firstName = `${firstName[0].toUpperCase().trim()}${firstName
+    .substring(1)
+    .trim()}`;
+  lastName = `${lastName[0].toUpperCase().trim()}${lastName
+    .substring(1)
+    .trim()}`;
   try {
     if (
       (await userCollection.findOne({ username })) ||
