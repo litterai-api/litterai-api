@@ -37,7 +37,7 @@ const registerUser = async (body) => {
       username,
       displayUsername,
       email,
-      hashedPassword,
+      password: hashedPassword,
       firstName,
       lastName,
       zipcode,
@@ -66,7 +66,7 @@ const registerUser = async (body) => {
     return {
       code: 201,
       data: {
-        id: insertResult.insertedId.toHexString(),
+        _id: insertResult.insertedId.toHexString(),
         username: displayUsername,
         email,
         firstName,
