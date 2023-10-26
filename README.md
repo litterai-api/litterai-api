@@ -12,12 +12,12 @@ JSON Request body should follow
 
 ```
 {
-    "username": <string>,
-    "email": <string>,
-    "password": <string>,
-    "firstName": <string>,
-    "lastName": <string>,
-    "zipCode": <string>
+  "username": <string>,
+  "email": <string>,
+  "password": <string>,
+  "firstName": <string>,
+  "lastName": <string>,
+  "zipCode": <string>
 }
 ```
 
@@ -26,12 +26,12 @@ JSON Request body should follow
 
 ```
 {
-    "userId": <string>,
-    "username": <string>,
-    "firstName": <string>,
-    "lastName": <string>,
-    "zipCode": <string>,
-    "token": <string>
+  "userId": <string>,
+  "username": <string>,
+  "firstName": <string>,
+  "lastName": <string>,
+  "zipCode": <string>,
+  "token": <string>
 }
 ```
 
@@ -55,7 +55,7 @@ JSON Request body should follow
 
 ```
 {
-    "username": <string>,
+  "username": <string>,
 	"email": <string>,
 	"firstName": <string>,
 	"lastName": <string>,
@@ -90,7 +90,7 @@ JSON Request body should follow
 
 ```
 {
-    "category": <string>,
-    "email": <string>
+  "category": <string>,
+  "email": <string>
 }
 ```
