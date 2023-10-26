@@ -25,6 +25,7 @@ const startServer = async () => {
 
     // Routes
     app.use('/', routes.auth);
+    app.use('/leaderboard', routes.leaderboard);
     app.use(isAuth);
     app.use('/photo', routes.photo);
     app.listen(PORT, () => {
