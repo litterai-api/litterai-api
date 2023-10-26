@@ -68,6 +68,8 @@ JSON Request body should follow
 
 ### Logout
 
+**POST** `/logout`
+
 Include user's JWT in an authorization header
 
 ```
@@ -80,7 +82,7 @@ Authorization: Bearer <token>
 
 After a photo has had its contents parsed by the AI send a request to this endpoint in order to have their photo information stored for the leaderboard
 
-**POST** `/photoInfo`
+**POST** `/photo`
 
 Include user's JWT in an authorization header
 
