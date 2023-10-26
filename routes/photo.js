@@ -4,6 +4,6 @@ import photoController from '../controllers/photo-upload/index.js';
 
 const photoRoutes = express.Router();
 
-photoRoutes.post('/add', photoController.postPhoto);
+photoRoutes.post('/', photoController.postPhoto);
 
 export default photoRoutes;
