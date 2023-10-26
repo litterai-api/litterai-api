@@ -70,7 +70,9 @@ JSON Request body should follow
 
 Include user's JWT in an authorization header
 
-`Authorization: Bearer <token>`
+```
+Authorization: Bearer <token>
+```
 
 ## Leaderboard endpoints
 
