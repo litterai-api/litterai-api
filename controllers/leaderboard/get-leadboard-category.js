@@ -26,8 +26,9 @@ const paramSchema = Joi.string()
  */
 const getLeaderboardByCategory = async (req, res) => {
   const { category } = req.params;
-  const page = req.query.page || 1;
-  const perPage = req.query.perPage || 10;
+  const page = parseInt(req.query.page, 10) || 1;
+  const perPage = parseInt(req.query.perPage, 10) || 10;
+  console.log(typeof page, typeof perPage);
   let user;
   if (req.user) {
     user = req.user;

@@ -15,13 +15,20 @@ const leaderboardByCategory = async (category, page, perPage, user = null) => {
   try {
     const skip = (page - 1) * perPage;
     const cursor = catCountCollection
-      .find({ [`pictureData.${category}`]: { $gt: 0 } })
+      .find(
+        { [`pictureData.${category}`]: { $gt: 0 } },
+        { projection: { username: 1, [`pictureData.${category}`]: 1 } },
+      )
       .sort({ [`pictureData.${category}`]: -1 })
       .skip(skip)
       .limit(perPage);
     const sortedResults = await cursor.toArray();
 
-    const totalCount = await catCountCollection.countDocuments({
+    const reshapedResults = sortedResults.map((doc) => ({
+      username: doc.username,
+      itemCount: doc.pictureData[category],
+    }));
+    const totalEntries = await catCountCollection.countDocuments({
       [`pictureData.${category}`]: { $gt: 0 },
     });
 
@@ -35,9 +42,11 @@ const leaderboardByCategory = async (category, page, perPage, user = null) => {
 
       // If the user is not in the result page get their place in the rankings
       if (!userInArray) {
-        const findUsercursor = catCountCollection.find().sort({
-          [`pictureData.${category}`]: -1,
-        });
+        const findUsercursor = catCountCollection
+          .find({ [`pictureData.${category}`]: { $gt: 0 } })
+          .sort({
+            [`pictureData.${category}`]: -1,
+          });
         const sortedArry = await findUsercursor.toArray();
         userRank = sortedArry.findIndex(
           (doc) => doc.userId.toString() === user._id,
@@ -51,7 +60,12 @@ const leaderboardByCategory = async (category, page, perPage, user = null) => {
     }
     return {
       code: 200,
-      data: { userRank: userRank + 1, totalCount, leaderboard: sortedResults },
+      data: {
+        category,
+        userRank: userRank === -1 ? -1 : userRank + 1,
+        totalEntries,
+        leaderboard: reshapedResults,
+      },
     };
   } catch (error) {
     console.log(error);
