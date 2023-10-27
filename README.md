@@ -99,3 +99,41 @@ JSON Request body should follow
   "email": <string>
 }
 ```
+
+### Get Leaderboard by Category
+
+Returns a json object that contains a category, the logged in user's rank,
+
+**GET** `/leaderboard/:category`
+
+**Query Params**
+
+| Syntax  | Description      | Default |
+| ------- | ---------------- | ------- |
+| page    | page to query    | 1       |
+| perPage | results per page | 10      |
+
+Ex: `/leaderboard/:glass?page=2&perPage=3`
+
+<details>
+<summary>Response</summary>
+
+When `userRank` is `null` a user is not logged in
+
+When `userRank` is `-1` the logged in user has not uploaded a photo of selected category
+
+```
+{
+    "category": <string>,
+    "userRank": <number>,
+    "totalCount": <number>,
+    "leaderboard": [
+        {
+            "username": "testerr",
+            "itemCount": 5
+        }
+    ]
+}
+```
+
+</details>
