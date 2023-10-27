@@ -15,6 +15,7 @@ JSON Request body should follow
   "username": <string>,
   "email": <string>,
   "password": <string>,
+  "confirmPassword": <string>,
   "firstName": <string>,
   "lastName": <string>,
   "zipCode": <string>
