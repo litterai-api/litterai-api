@@ -27,7 +27,7 @@ JSON Request body should follow
 
 ```
 {
-  "userId": <string>,
+  "_id": <string>,
   "username": <string>,
   "firstName": <string>,
   "lastName": <string>,
@@ -46,8 +46,8 @@ JSON Request body should follow
 
 ```
 {
-	"email": <string>,
-	"password": <string>
+  "email": <string>,
+  "password": <string>
 }
 ```
 
@@ -56,12 +56,13 @@ JSON Request body should follow
 
 ```
 {
+  "_id": <string>,
   "username": <string>,
-	"email": <string>,
-	"firstName": <string>,
-	"lastName": <string>,
-	"zipCode": <string>,
-	"token": <string>,
+  "email": <string>,
+  "firstName": <string>,
+  "lastName": <string>,
+  "zipCode": <string>,
+  "token": <string>,
 }
 ```
 
@@ -100,6 +101,20 @@ JSON Request body should follow
 }
 ```
 
+<details>
+<summary>Response</summary>
+
+```
+{
+  "username": <string>,
+  "category": <string>,
+  "categoryUploads": <number>,
+  "totalUploads": <number>,
+}
+```
+
+</details>
+
 ### Get Leaderboard by Category
 
 Returns a json object that contains a category, the logged in user's rank,
@@ -126,12 +141,13 @@ When `userRank` is `-1` the logged in user has not uploaded a photo of selected 
 {
     "category": <string>,
     "userRank": <number>,
-    "totalCount": <number>,
+    "totalEntries": <number>,
     "leaderboard": [
         {
-            "username": "testerr",
-            "itemCount": 5
+            "username": <string>,
+            "itemCount": <number>
         }
+        // ...
     ]
 }
 ```
