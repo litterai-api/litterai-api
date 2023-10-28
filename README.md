@@ -46,8 +46,8 @@ JSON Request body should follow
 
 ```
 {
-	"email": <string>,
-	"password": <string>
+  "email": <string>,
+  "password": <string>
 }
 ```
 
