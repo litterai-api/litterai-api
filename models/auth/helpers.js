@@ -6,12 +6,13 @@ const __filename = fileURLToPath(import.meta.url);
 
 const catCountCollection = getCatCountCollection;
 
-const createUserPhotoDoc = async (userId, username, email) => {
+const createUserPhotoDoc = async (userId, username, displayUsername, email) => {
   try {
     const payload = {
       userId,
       email,
       username,
+      displayUsername,
       pictureData: {
         paper: 0,
         cardboard: 0,
