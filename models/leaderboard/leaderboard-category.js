@@ -39,7 +39,6 @@ const leaderboardByCategory = async (category, page, perPage, user = null) => {
       const userInArray = sortedResults.find(
         (doc) => doc.userId === new ObjectId(user._id),
       );
-
       // If the user is not in the result page get their place in the rankings
       if (!userInArray) {
         const findUsercursor = catCountCollection
