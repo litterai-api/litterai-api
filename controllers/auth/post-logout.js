@@ -6,6 +6,10 @@ import { getBlacklistCollection } from '../../DB/collections.js';
 const blacklistCollection = getBlacklistCollection;
 
 const __filename = fileURLToPath(import.meta.url);
+/**
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 const postLogout = async (req, res) => {
   try {
     const authHeader = req.get('Authorization');

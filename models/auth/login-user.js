@@ -42,6 +42,7 @@ const loginUser = async (body) => {
     return {
       code: 201,
       data: {
+        _id: userDoc._id,
         username: userDoc.username,
         email: userDoc.email,
         firstName: userDoc.firstName,
