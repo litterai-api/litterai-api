@@ -39,9 +39,14 @@ const addPhoto = async (categoryString, user) => {
       { returnDocument: true },
     );
 
+    if (!document) {
+      return { code: 404, data: { message: 'No info found' } };
+    }
+
     return {
       code: 201,
       data: {
+        username: document.username,
         category: categoryString,
         categoryUploads: document.pictureData[categoryString],
         totalUploads: document.totalUploads,
