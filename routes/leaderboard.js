@@ -9,4 +9,5 @@ leaderboardRoutes.get(
   extractUser,
   leaderboardController.getLeaderboardByCategory,
 );
+
 export default leaderboardRoutes;
