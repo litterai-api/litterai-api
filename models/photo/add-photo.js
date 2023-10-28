@@ -36,7 +36,7 @@ const addPhoto = async (categoryString, user) => {
     const document = await categoryCollection.findOneAndUpdate(
       { userId: new ObjectId(user._id) },
       { $inc: { totalUploads: 1, [`pictureData.${categoryString}`]: 1 } },
-      { returnDocument: true },
+      { returnDocument: 'after' },
     );
 
     if (!document) {
