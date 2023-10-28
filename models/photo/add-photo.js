@@ -38,7 +38,7 @@ const addPhoto = async (categoryString, user) => {
       { $inc: { totalUploads: 1, [`pictureData.${categoryString}`]: 1 } },
       { returnDocument: 'after' },
     );
-    console.log(document);
+
     if (!document) {
       return { code: 404, data: { message: 'No info found' } };
     }
