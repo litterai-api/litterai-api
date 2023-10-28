@@ -33,11 +33,20 @@ const addPhoto = async (categoryString, user) => {
       createdAt: Date.now(),
     });
 
-    await categoryCollection.updateOne(
+    const document = await categoryCollection.findOneAndUpdate(
       { userId: new ObjectId(user._id) },
       { $inc: { totalUploads: 1, [`pictureData.${categoryString}`]: 1 } },
+      { returnDocument: true },
     );
-    return { code: 201, data: { message: 'Succesfully added photo' } };
+
+    return {
+      code: 201,
+      data: {
+        category: categoryString,
+        categoryUploads: document.pictureData[categoryString],
+        totalUploads: document.totalUploads,
+      },
+    };
   } catch (error) {
     console.log(error);
     logError(error, __filename, 'addPhoto');
