@@ -28,15 +28,6 @@ const registerUser = async (body) => {
     .substring(1)
     .trim()}`;
   try {
-    if (
-      (await userCollection.findOne({ username })) ||
-      (await userCollection.findOne({ email }))
-    ) {
-      return {
-        code: 409,
-        data: { message: 'Username or Email already in use.' },
-      };
-    }
     const hashedPassword = await bcrypt.hash(password, 12);
     const payload = {
       username,
@@ -62,7 +53,7 @@ const registerUser = async (body) => {
       displayUsername,
       email,
     );
-    console.log('INSERTED THING: ', insertResult);
+
     const token = jwt.sign(
       {
         _id: insertResult.insertedId.toHexString(),
