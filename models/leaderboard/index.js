@@ -1,7 +1,7 @@
-import leaderboardByCategory from './leaderboard-category.js';
+import leaderboardByTotal from './leaderboard-total.js';
 
 const leaderboardModel = {
-  leaderboardByCategory,
+  leaderboardByTotal,
 };
 
 export default leaderboardModel;
