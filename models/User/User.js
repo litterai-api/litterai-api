@@ -21,8 +21,10 @@ const User = {
       return userDoc;
     } catch (error) {
       console.error(error);
-      logError(error, __filename, 'findByEmail');
-      return null;
+      logError(error, __filename, 'findById');
+      error.statusCode = 500;
+      error.message = `Internal Service Error: ${error.message}`;
+      throw error;
     }
   },
 
@@ -37,7 +39,9 @@ const User = {
     } catch (error) {
       console.error(error);
       logError(error, __filename, 'findById');
-      return null;
+      error.statusCode = 500;
+      error.message = `Internal Service Error: ${error.message}`;
+      throw error;
     }
   },
 
@@ -50,7 +54,9 @@ const User = {
     } catch (error) {
       console.error(error);
       logError(error, __filename, 'findById');
-      return null;
+      error.statusCode = 500;
+      error.message = `Internal Service Error: ${error.message}`;
+      throw error;
     }
   },
 
@@ -78,7 +84,7 @@ const User = {
     const trimmedLastName = lastName.trim();
     const lowerCaseUsername = displayUsername.toLowerCase().trim();
     const trimmedDisplayname = displayUsername.trim();
-    const trimmedEmail = email.trim();
+    const trimmedEmail = email.toLowerCase().trim();
     const trimmedZipCode = zipCode.trim();
 
     const payload = {
@@ -115,6 +121,7 @@ const User = {
         zipCode: payload.zipCode,
       };
     } catch (error) {
+      logError(error, __filename, 'create');
       error.message = `Database operation failed: ${error.message}`;
       error.statusCode = 500;
       throw error;
