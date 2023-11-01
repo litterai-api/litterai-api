@@ -1,8 +1,8 @@
 import getLeaderboardByCategory from './get-leadboard-category.js';
-// import getLeaderboard from './get-leaderboard-general.js';
+import getLeaderboardByTotal from './get-leaderboard-total.js';
 
 const leaderboardController = {
   getLeaderboardByCategory,
-  // getLeaderboard,
+  getLeaderboardByTotal,
 };
 export default leaderboardController;

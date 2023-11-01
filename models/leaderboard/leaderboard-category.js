@@ -17,7 +17,13 @@ const leaderboardByCategory = async (category, page, perPage, user = null) => {
     const cursor = catCountCollection
       .find(
         { [`pictureData.${category}`]: { $gt: 0 } },
-        { projection: { username: 1, [`pictureData.${category}`]: 1 } },
+        {
+          projection: {
+            username: 1,
+            displayUsername: 1,
+            [`pictureData.${category}`]: 1,
+          },
+        },
       )
       .sort({ [`pictureData.${category}`]: -1 })
       .skip(skip)

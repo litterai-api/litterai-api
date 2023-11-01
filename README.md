@@ -49,8 +49,8 @@ JSON Request body should follow
 
 ```
 {
-	"email": <string>,
-	"password": <string>
+  "email": <string>,
+  "password": <string>
 }
 ```
 
@@ -60,7 +60,7 @@ JSON Request body should follow
 ```
 {
   "user": {
-    "userId": <string>,
+    "_id": <string>,
     "username": <string>,
     "displayUsername": <string>,
     "firstName": <string>,

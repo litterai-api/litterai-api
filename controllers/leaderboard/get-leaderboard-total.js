@@ -6,19 +6,17 @@ import logError from '../../Errors/log-error.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
-const paramSchema = Joi.string().required();
-
-// TODO: Create Validation schema
-// const schema = Joi.
+const getLeaderboardTotalSchema = Joi.object({
+  page: Joi.number().min(1).max(1000),
+  perPage: Joi.number().min(1).max(50),
+});
 
 /**
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  */
 
-/* REMOVE THIS LINE TO UNCOMMENT CODE/////////////////////////////////////////////////////// 
-
-const getLeaderboard = async (req, res) => {
+const getLeaderboardByTotal = async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
   const perPage = parseInt(req.query.perPage, 10) || 10;
   let user;
@@ -27,14 +25,19 @@ const getLeaderboard = async (req, res) => {
   }
 
   try {
-    // TODO: VALIDATE
-    const { error } = paramSchema.validate();
+    const { error } = getLeaderboardTotalSchema.validate({ page, perPage });
     if (error) {
+      console.log('IN SCHEMA ERROR');
       return res
         .status(422)
         .send({ message: 'Validation Error', error: error.details[0].message });
     }
-    const { code, data } = await leaderboardModel.leaderboardGeneral();
+
+    const { code, data } = await leaderboardModel.leaderboardByTotal(
+      page,
+      perPage,
+      user,
+    );
 
     return res.status(code).send(data);
   } catch (error) {
@@ -44,5 +47,4 @@ const getLeaderboard = async (req, res) => {
   }
 };
 
-export default getLeaderboardByCategory;
- */
+export default getLeaderboardByTotal;
