@@ -36,7 +36,6 @@ const leaderboardByTotal = async (page, perPage, user = null) => {
       totalUploads: { $gt: 0 },
     });
 
-    console.log('user: ', user);
 
     let userRank;
     if (user) {
@@ -49,7 +48,7 @@ const leaderboardByTotal = async (page, perPage, user = null) => {
           .find({ totalUploads: { $gt: 0 } })
           .sort({ totalUploads: -1 });
         const sortedArray = await findUserCursor.toArray();
-        // console.log('sortedArray: ', sortedArray);
+        
         userRank =
           sortedArray.findIndex((doc) => doc.userId.toString() === user._id) +
           1;
