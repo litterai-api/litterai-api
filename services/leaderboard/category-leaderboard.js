@@ -14,7 +14,7 @@ const categoryLeaderboardService = async (category, page, perPage, user) => {
       (doc) => doc.username === user.username,
     );
 
-    // If the user is not in this page of the leaderboard
+    // If the user is not in this page of the leaderboard get their ranking from the full list
     if (!userInLeaderboardPage) {
       const fullLeaderboard = await CategoryCount.getLeaderboardByCategory(category);
       userRank = fullLeaderboard.leaderboard.findIndex(
