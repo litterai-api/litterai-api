@@ -1,4 +1,4 @@
-import CategoryCount from '../../models/CategoryCount/CategoryCount.js';
+import CategoryCount from '../../models/CategoryCount.js';
 
 const categoryLeaderboardService = async (category, page, perPage, user) => {
   const leaderboardPage = await CategoryCount.getLeaderboardByCategory(
