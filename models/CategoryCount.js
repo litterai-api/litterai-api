@@ -46,7 +46,6 @@ const CategoryCount = {
       },
       {
         $project: {
-          // _id: 0,
           username: 1,
           displayUsername: 1,
           itemCount: `$pictureData.${category}`,
