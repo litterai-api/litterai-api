@@ -1,4 +1,4 @@
-import getLeaderboardByCategory from './get-leadboard-category.js';
+import getLeaderboardByCategory from './get-leaderboard-category.js';
 import getLeaderboardByTotal from './get-leaderboard-total.js';
 
 const leaderboardController = {

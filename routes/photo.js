@@ -1,6 +1,6 @@
 import express from 'express';
 
-import photoController from '../controllers/photo-upload/index.js';
+import photoController from '../controllers/photo-info/index.js';
 
 const photoRoutes = express.Router();
 
