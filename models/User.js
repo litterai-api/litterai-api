@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 
-import { getUserCollection } from '../../DB/collections.js';
-import CategoryCount from '../CategoryCount/CategoryCount.js';
+import { getUserCollection } from '../DB/collections.js';
+import CategoryCount from './CategoryCount.js';
 
 /**
  * @type {import('mongodb').Collection}
