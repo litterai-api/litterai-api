@@ -1,8 +1,8 @@
 import { fileURLToPath } from 'url';
 import Joi from 'joi';
 
-import leaderboardModel from '../../models/leaderboard/index.js';
 import logError from '../../Errors/log-error.js';
+import categoryLeaderboardService from '../../services/leaderboard/category-leaderboard.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -33,6 +33,7 @@ const getLeaderboardByCategory = async (req, res) => {
     user = req.user;
   }
 
+  // Validate request body
   try {
     const { error } = paramSchema.validate(category);
     if (error) {
@@ -40,17 +41,28 @@ const getLeaderboardByCategory = async (req, res) => {
         .status(422)
         .send({ message: 'Validation Error', error: error.details[0].message });
     }
-    const { code, data } = await leaderboardModel.leaderboardByCategory(
+
+    // Execute service
+    const result = await categoryLeaderboardService(
       category,
       page,
       perPage,
       user,
     );
-    return res.status(code).send(data);
+
+    // Return successful request
+    return res.status(200).send(result);
   } catch (error) {
-    logError(error, __filename, 'register');
     console.log(error);
-    return { code: 500, data: { message: 'Internal Service Error' } };
+
+    // Log the error
+    logError(error, __filename, 'postRegister');
+
+    // If a custom error was created use it
+    if (error.statusCode) {
+      return res.status(error.statusCode).send({ message: error.message });
+    }
+    return res.status(500).send({ message: 'Internal Service Error' });
   }
 };
 

@@ -10,11 +10,12 @@ import isAuth from './middleware/isAuth.js';
 
 const app = express();
 
-const { JWT_SECRET, MONGO_URI } = process.env;
+const { JWT_SECRET, MONGO_URI, SERVER_PORT } = process.env;
 
 const __filename = fileURLToPath(import.meta.url);
 
-const PORT = process.env.API_PORT || 3000;
+const PORT = SERVER_PORT || 3000;
+
 
 const startServer = async () => {
   try {
@@ -27,15 +28,14 @@ const startServer = async () => {
 
     app.use((req, res, next) => {
       if (!JWT_SECRET || !MONGO_URI) {
-        return res
-          .status(500)
-          .send({
-            message: 'Internal Service Error',
-            error: 'Server missing Database Connection String or Secret',
-          });
+        return res.status(500).send({
+          message: 'Internal Service Error',
+          error: 'Server missing Database Connection String or Secret',
+        });
       }
-      next();
+      return next();
     });
+
     // Routes
     app.use('/', routes.auth);
     app.use('/leaderboard', routes.leaderboard);

@@ -27,11 +27,14 @@ JSON Request body should follow
 
 ```
 {
-  "_id": <string>,
-  "username": <string>,
-  "firstName": <string>,
-  "lastName": <string>,
-  "zipCode": <string>,
+  "user": {
+    "userId": <string>,
+    "username": <string>,
+    "displayUsername": <string>,
+    "firstName": <string>,
+    "lastName": <string>,
+    "zipCode": <string>,
+  }
   "token": <string>
 }
 ```
@@ -56,13 +59,15 @@ JSON Request body should follow
 
 ```
 {
-  "_id": <string>,
-  "username": <string>,
-  "email": <string>,
-  "firstName": <string>,
-  "lastName": <string>,
-  "zipCode": <string>,
-  "token": <string>,
+  "user": {
+    "_id": <string>,
+    "username": <string>,
+    "displayUsername": <string>,
+    "firstName": <string>,
+    "lastName": <string>,
+    "zipCode": <string>,
+  }
+  "token": <string>
 }
 ```
 
