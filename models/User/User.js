@@ -1,8 +1,6 @@
-import { fileURLToPath } from 'url';
 import { ObjectId } from 'mongodb';
 
 import { getUserCollection } from '../../DB/collections.js';
-import logError from '../../Errors/log-error.js';
 import CategoryCount from '../CategoryCount/CategoryCount.js';
 
 /**
@@ -11,8 +9,6 @@ import CategoryCount from '../CategoryCount/CategoryCount.js';
 
 const usersCollection = getUserCollection;
 
-const __filename = fileURLToPath(import.meta.url);
-
 const User = {
   findByEmail: async (email) => {
     const sanitizedEmail = email.toLowerCase().trim();
@@ -20,8 +16,6 @@ const User = {
       const userDoc = await usersCollection.findOne({ email: sanitizedEmail });
       return userDoc;
     } catch (error) {
-      console.error(error);
-      logError(error, __filename, 'findById');
       error.statusCode = 500;
       error.message = `Internal Service Error: ${error.message}`;
       throw error;
@@ -37,8 +31,6 @@ const User = {
       const userDoc = await usersCollection.findOne({ _id: userId });
       return userDoc;
     } catch (error) {
-      console.error(error);
-      logError(error, __filename, 'findById');
       error.statusCode = 500;
       error.message = `Internal Service Error: ${error.message}`;
       throw error;
@@ -52,8 +44,6 @@ const User = {
       });
       return userDoc;
     } catch (error) {
-      console.error(error);
-      logError(error, __filename, 'findById');
       error.statusCode = 500;
       error.message = `Internal Service Error: ${error.message}`;
       throw error;
@@ -80,13 +70,14 @@ const User = {
       error.statusCode = 400;
       throw error;
     }
+    // Sanitize data
     const trimmedFirstName = firstName.trim();
     const trimmedLastName = lastName.trim();
     const lowerCaseUsername = displayUsername.toLowerCase().trim();
     const trimmedDisplayname = displayUsername.trim();
     const trimmedEmail = email.toLowerCase().trim();
     const trimmedZipCode = zipCode.trim();
-
+    // Create payload
     const payload = {
       username: lowerCaseUsername,
       displayUsername: trimmedDisplayname,
@@ -103,7 +94,7 @@ const User = {
 
     try {
       const userDoc = await usersCollection.insertOne(payload);
-
+      // Create a category count document within CategoryCount Collection
       await CategoryCount.create(
         userDoc.insertedId,
         lowerCaseUsername,
@@ -121,7 +112,6 @@ const User = {
         zipCode: payload.zipCode,
       };
     } catch (error) {
-      logError(error, __filename, 'create');
       error.message = `Database operation failed: ${error.message}`;
       error.statusCode = 500;
       throw error;
