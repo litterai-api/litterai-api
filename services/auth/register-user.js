@@ -1,29 +1,25 @@
-import { fileURLToPath } from 'url';
-
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../../models/User/User.js';
-import logError from '../../Errors/log-error.js';
-
-const __filename = fileURLToPath(import.meta.url);
 
 const { JWT_SECRET } = process.env;
 
 const registerUserService = async (body) => {
   const { username, email, password, firstName, lastName, zipCode } = body;
 
+  // Check if username or email in use
   if (
     (await User.findByEmail(email)) ||
     (await User.findByUsername(username))
   ) {
     const error = new Error('Username or Email already in use');
-    logError(error, __filename, 'create');
     error.statusCode = 409;
     throw error;
   }
 
-  const hashedPass = await bcrypt.hash(password.trim(), 10);
+  const hashedPass = await bcrypt.hash(password, 10);
 
+  // Create user
   const result = await User.create(
     username,
     email,
@@ -33,8 +29,8 @@ const registerUserService = async (body) => {
     zipCode,
   );
 
+  // Sign Token
   let token;
-
   try {
     token = jwt.sign(
       {
@@ -45,8 +41,6 @@ const registerUserService = async (body) => {
       JWT_SECRET,
     );
   } catch (error) {
-    console.log(error);
-    logError(error, __filename, 'registerUserService token signing');
     error.statusCode = 500;
     error.message = `Internal Service Error: ${error.message}`;
     throw error;
