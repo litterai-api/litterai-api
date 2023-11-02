@@ -1,6 +1,4 @@
 import { fileURLToPath } from 'url';
-// import bcrypt from 'bcrypt';
-
 import { loginSchema } from './authReqBodySchemas.js';
 import logError from '../../Errors/log-error.js';
 import loginUserService from '../../services/auth/login-user.js';
