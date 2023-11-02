@@ -17,7 +17,6 @@ const getCurrentDateFormatted = () => {
 const logError = async (errorObject, filePath, functionName, context) => {
   const date = getCurrentDateFormatted();
   const errorLogPath = path.join(__dirname, 'logs', `${date}.json`);
-  // .../litterapi-api/Errors/logs/
   const newErrorInfo = {
     timestamp: new Date().toISOString(),
     functionName,
