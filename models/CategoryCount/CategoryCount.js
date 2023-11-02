@@ -1,8 +1,4 @@
-import { fileURLToPath } from 'url';
 import { getCatCountCollection } from '../../DB/collections.js';
-import logError from '../../Errors/log-error.js';
-
-const __filename = fileURLToPath(import.meta.url);
 
 /**
  * @type {import('mongodb').Collection}
@@ -33,8 +29,9 @@ const CategoryCount = {
 
       catCountCollection.insertOne(payload);
     } catch (error) {
-      await logError(error, __filename, 'createUserPhotoDoc');
-      console.log(error);
+      error.message = `Database operation failed: ${error.message}`;
+      error.statusCode = 500;
+      throw error;
     }
   },
 
@@ -91,7 +88,7 @@ const CategoryCount = {
         [`pictureData.${category}`]: { $gt: 0 },
       });
     } catch (error) {
-      error.message = `Internal Service Error: ${error.message}`;
+      error.message = `Database operation failed: ${error.message}`;
       error.statusCode = 500;
       throw error;
     }
