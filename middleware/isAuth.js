@@ -28,15 +28,17 @@ const isAuth = async (req, res, next) => {
   const authHeader = req.get('Authorization');
   if (!authHeader) {
     return res.status(422).send({
+      status: 'error',
       message: 'Authentication token is required for this endpoint.',
     });
   }
 
   const { error } = authTokenSchema.validate(authHeader);
   if (error) {
-    return res
-      .status(422)
-      .send({ message: "Authorization header must begin with 'Bearer'" });
+    return res.status(422).send({
+      status: 'error',
+      message: "Authorization header must begin with 'Bearer'",
+    });
   }
 
   const authToken = authHeader.split(' ')[1];
@@ -44,12 +46,16 @@ const isAuth = async (req, res, next) => {
 
   try {
     if (isBlacklisted) {
-      return res.status(401).send({ message: 'Invalid Token' });
+      return res
+        .status(401)
+        .send({ status: 'error', message: 'Invalid Token' });
     }
   } catch (err) {
     console.log(err);
     logError(err, __filename, 'isAuth');
-    return res.status(500).send({ message: 'Internal Service Error' });
+    return res
+      .status(500)
+      .send({ status: 'error', message: 'Internal Service Error' });
   }
 
   let decodedToken;
@@ -59,11 +65,11 @@ const isAuth = async (req, res, next) => {
     console.log(err);
     return res
       .status(401)
-      .send({ message: 'Unauthorized', error: err.message });
+      .send({ status: 'error', message: 'Unauthorized', error: err.message });
   }
 
   if (!decodedToken) {
-    return res.status(401).send({ message: 'Unauthorized' });
+    return res.status(401).send({ status: 'error', message: 'Unauthorized' });
   }
 
   req.user = decodedToken;
