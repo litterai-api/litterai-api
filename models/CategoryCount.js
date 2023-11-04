@@ -1,6 +1,10 @@
+import { fileURLToPath } from 'url';
 import { ObjectId } from 'mongodb';
 import { getCatCountCollection } from '../DB/collections.js';
 
+import logError from '../Errors/log-error.js';
+
+const __filename = fileURLToPath(import.meta.url);
 /**
  * @type {import('mongodb').Collection}
  */
@@ -30,6 +34,7 @@ const CategoryCount = {
 
       catCountCollection.insertOne(payload);
     } catch (error) {
+      await logError(error, __filename, 'CategoryCount.create');
       error.message = `Database operation failed: ${error.message}`;
       error.statusCode = 500;
       throw error;
@@ -90,6 +95,7 @@ const CategoryCount = {
         [`pictureData.${category}`]: { $gt: 0 },
       });
     } catch (error) {
+      await logError(error, __filename, 'CategoryCount.findByUserId');
       error.message = `Database operation failed: ${error.message}`;
       error.statusCode = 500;
       throw error;
@@ -118,6 +124,11 @@ const CategoryCount = {
       );
       return categoryCountDocument;
     } catch (error) {
+      await logError(
+        error,
+        __filename,
+        'CategoryCount.getLeaderboardByCategory',
+      );
       error.message = `Database operation failed: ${error.message}`;
       error.statusCode = 500;
       throw error;
@@ -146,6 +157,11 @@ const CategoryCount = {
       );
       return categoryDocument;
     } catch (error) {
+      await logError(
+        error,
+        __filename,
+        'CategoryCount.incrementCategoryByUserId',
+      );
       error.message = `Database operation failed: ${error.message}`;
       error.statusCode = 500;
       throw error;

@@ -1,7 +1,12 @@
+import { fileURLToPath } from 'url';
 import { ObjectId } from 'mongodb';
 
 import { getUserCollection } from '../DB/collections.js';
 import CategoryCount from './CategoryCount.js';
+
+import logError from '../Errors/log-error.js';
+
+const __filename = fileURLToPath(import.meta.url);
 
 /**
  * @type {import('mongodb').Collection}
@@ -16,6 +21,7 @@ const User = {
       const userDoc = await usersCollection.findOne({ email: sanitizedEmail });
       return userDoc;
     } catch (error) {
+      await logError(error, __filename, 'User.findByEmail');
       error.statusCode = 500;
       error.message = `Internal Service Error: ${error.message}`;
       throw error;
@@ -31,6 +37,8 @@ const User = {
       const userDoc = await usersCollection.findOne({ _id: userId });
       return userDoc;
     } catch (error) {
+      await logError(error, __filename, 'User.findById');
+
       error.statusCode = 500;
       error.message = `Internal Service Error: ${error.message}`;
       throw error;
@@ -44,6 +52,7 @@ const User = {
       });
       return userDoc;
     } catch (error) {
+      await logError(error, __filename, 'User.findByUsername');
       error.statusCode = 500;
       error.message = `Internal Service Error: ${error.message}`;
       throw error;
@@ -112,6 +121,7 @@ const User = {
         zipCode: payload.zipCode,
       };
     } catch (error) {
+      await logError(error, __filename, 'User.create');
       error.message = `Database operation failed: ${error.message}`;
       error.statusCode = 500;
       throw error;

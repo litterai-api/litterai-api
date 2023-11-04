@@ -1,6 +1,11 @@
+import { fileURLToPath } from 'url';
 import { ObjectId } from 'mongodb';
 import { getUploadInfoCollection } from '../DB/collections.js';
 import CategoryCount from './CategoryCount.js';
+
+import logError from '../Errors/log-error.js';
+
+const __filename = fileURLToPath(import.meta.url);
 
 /**
  * @type {import('mongodb').Collection}
@@ -32,6 +37,7 @@ const PhotoInfo = {
         createdAt: Date.now(),
       });
     } catch (error) {
+      await logError(error, __filename, 'PhotoInfo.insertOne');
       error.message = `Database operation failed: ${error.message}`;
       error.statusCode = 500;
       throw error;
