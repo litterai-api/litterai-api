@@ -8,11 +8,14 @@ import routes from './routes/index.js';
 import logError from './Errors/log-error.js';
 import isAuth from './middleware/isAuth.js';
 
-const __filename = fileURLToPath(import.meta.url);
-
 const app = express();
 
-const PORT = process.env.API_PORT || 3000;
+const { JWT_SECRET, MONGO_URI, SERVER_PORT } = process.env;
+
+const __filename = fileURLToPath(import.meta.url);
+
+const PORT = SERVER_PORT || 3000;
+
 
 const startServer = async () => {
   try {
@@ -23,8 +26,19 @@ const startServer = async () => {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
+    app.use((req, res, next) => {
+      if (!JWT_SECRET || !MONGO_URI) {
+        return res.status(500).send({
+          message: 'Internal Service Error',
+          error: 'Server missing Database Connection String or Secret',
+        });
+      }
+      return next();
+    });
+
     // Routes
     app.use('/', routes.auth);
+    app.use('/leaderboard', routes.leaderboard);
     app.use(isAuth);
     app.use('/photo', routes.photo);
     app.listen(PORT, () => {

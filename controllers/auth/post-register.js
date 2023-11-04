@@ -1,15 +1,14 @@
 import { fileURLToPath } from 'url';
 import logError from '../../Errors/log-error.js';
-import authModel from '../../models/auth/index.js';
+import registerUserService from '../../services/auth/register-user.js';
+
 import { registerSchema } from './authReqBodySchemas.js';
 
 const __filename = fileURLToPath(import.meta.url);
-/**
- * @param {import('express').Request} req
- * @param {import('express').Response} res
- */
+
 const postRegister = async (req, res) => {
   try {
+    // Validate request body
     const { error } = registerSchema.validate(req.body);
     if (error) {
       console.log(error);
@@ -23,11 +22,29 @@ const postRegister = async (req, res) => {
         .status(422)
         .send({ message: 'Validation Error', error: error.details[0].message });
     }
-    const { code, data } = await authModel.register(req.body);
-    return res.status(code).send(data);
+
+    // Create new user
+    const result = await registerUserService(req.body);
+
+    // If result is null but somehow no error was thrown
+    if (!result) {
+      return res
+        .status(500)
+        .send({ status: 'error', message: 'Internal Service Error' });
+    }
+
+    // send a response with registration data
+    return res.status(201).send(result);
   } catch (error) {
-    console.log('ERROR: ', error);
+    console.log(error);
+
+    // Log the error
     logError(error, __filename, 'postRegister');
+
+    // If a custom error was created use it
+    if (error.statusCode) {
+      return res.status(error.statusCode).send({ message: error.message });
+    }
     return res.status(500).send({ message: 'Internal Service Error' });
   }
 };

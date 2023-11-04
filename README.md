@@ -15,6 +15,7 @@ JSON Request body should follow
   "username": <string>,
   "email": <string>,
   "password": <string>,
+  "confirmPassword": <string>,
   "firstName": <string>,
   "lastName": <string>,
   "zipCode": <string>
@@ -26,11 +27,14 @@ JSON Request body should follow
 
 ```
 {
-  "userId": <string>,
-  "username": <string>,
-  "firstName": <string>,
-  "lastName": <string>,
-  "zipCode": <string>,
+  "user": {
+    "userId": <string>,
+    "username": <string>,
+    "displayUsername": <string>,
+    "firstName": <string>,
+    "lastName": <string>,
+    "zipCode": <string>,
+  }
   "token": <string>
 }
 ```
@@ -45,8 +49,8 @@ JSON Request body should follow
 
 ```
 {
-	"email": <string>,
-	"password": <string>
+  "email": <string>,
+  "password": <string>
 }
 ```
 
@@ -55,12 +59,15 @@ JSON Request body should follow
 
 ```
 {
-  "username": <string>,
-	"email": <string>,
-	"firstName": <string>,
-	"lastName": <string>,
-	"zipCode": <string>,
-	"token": <string>,
+  "user": {
+    "_id": <string>,
+    "username": <string>,
+    "displayUsername": <string>,
+    "firstName": <string>,
+    "lastName": <string>,
+    "zipCode": <string>,
+  }
+  "token": <string>
 }
 ```
 
@@ -98,3 +105,56 @@ JSON Request body should follow
   "email": <string>
 }
 ```
+
+<details>
+<summary>Response</summary>
+
+```
+{
+  "username": <string>,
+  "category": <string>,
+  "categoryUploads": <number>,
+  "totalUploads": <number>,
+}
+```
+
+</details>
+
+### Get Leaderboard by Category
+
+Returns a json object that contains a category, the logged in user's rank,
+
+**GET** `/leaderboard/:category`
+
+**Query Params**
+
+| Syntax  | Description      | Default |
+| ------- | ---------------- | ------- |
+| page    | page to query    | 1       |
+| perPage | results per page | 10      |
+
+Ex: `/leaderboard/:glass?page=2&perPage=3`
+
+<details>
+<summary>Response</summary>
+
+When `userRank` is `null` a user is not logged in
+
+When `userRank` is `-1` the logged in user has not uploaded a photo of selected category
+
+```
+{
+    "category": <string>,
+    "userRank": <number>,
+    "totalEntries": <number>,
+    "leaderboard": [
+        {
+            "username": <string>,
+            "itemCount": <number>
+        }
+        // ...
+    ]
+}
+```
+
+</details>
