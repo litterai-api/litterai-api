@@ -35,16 +35,6 @@ const postRegister = async (req, res, next) => {
     return res.status(201).send(result);
   } catch (error) {
     return next(error);
-    // console.log(error);
-
-    // // Log the error
-    // logError(error, __filename, 'postRegister');
-
-    // // If a custom error was created use it
-    // if (error.statusCode) {
-    //   return res.status(error.statusCode).send({ message: error.message });
-    // }
-    // return res.status(500).send({ message: 'Internal Service Error' });
   }
 };
 export default postRegister;
