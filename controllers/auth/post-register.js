@@ -1,12 +1,10 @@
-import { fileURLToPath } from 'url';
-import logError from '../../Errors/log-error.js';
 import registerUserService from '../../services/auth/register-user.js';
 
 import { registerSchema } from './authReqBodySchemas.js';
 
-const __filename = fileURLToPath(import.meta.url);
-
-const postRegister = async (req, res) => {
+const postRegister = async (req, res, next) => {
+  // TODO: add rate limiting
+  // TODO: add captcha
   try {
     // Validate request body
     const { error } = registerSchema.validate(req.body);
@@ -36,16 +34,17 @@ const postRegister = async (req, res) => {
     // send a response with registration data
     return res.status(201).send(result);
   } catch (error) {
-    console.log(error);
+    return next(error);
+    // console.log(error);
 
-    // Log the error
-    logError(error, __filename, 'postRegister');
+    // // Log the error
+    // logError(error, __filename, 'postRegister');
 
-    // If a custom error was created use it
-    if (error.statusCode) {
-      return res.status(error.statusCode).send({ message: error.message });
-    }
-    return res.status(500).send({ message: 'Internal Service Error' });
+    // // If a custom error was created use it
+    // if (error.statusCode) {
+    //   return res.status(error.statusCode).send({ message: error.message });
+    // }
+    // return res.status(500).send({ message: 'Internal Service Error' });
   }
 };
 export default postRegister;

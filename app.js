@@ -6,7 +6,8 @@ import { fileURLToPath } from 'url';
 import { getDb, mongoConnect } from './DB/db-connection.js';
 import routes from './routes/index.js';
 import logError from './Errors/log-error.js';
-import isAuth from './middleware/isAuth.js';
+// import isAuth from './middleware/isAuth.js';
+import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
@@ -15,7 +16,6 @@ const { JWT_SECRET, MONGO_URI, SERVER_PORT } = process.env;
 const __filename = fileURLToPath(import.meta.url);
 
 const PORT = SERVER_PORT || 3000;
-
 
 const startServer = async () => {
   try {
@@ -39,8 +39,10 @@ const startServer = async () => {
     // Routes
     app.use('/', routes.auth);
     app.use('/leaderboard', routes.leaderboard);
-    app.use(isAuth);
+    // app.use(isAuth);
     app.use('/photo', routes.photo);
+
+    app.use(errorHandler);
     app.listen(PORT, () => {
       console.log(
         `Server started on port: ${PORT}\nConnected to db: ${db.databaseName}`,

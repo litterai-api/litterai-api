@@ -1,16 +1,12 @@
-import { fileURLToPath } from 'url';
-
-import logError from '../../Errors/log-error.js';
 import { getBlacklistCollection } from '../../DB/collections.js';
 
 const blacklistCollection = getBlacklistCollection;
 
-const __filename = fileURLToPath(import.meta.url);
 /**
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  */
-const postLogout = async (req, res) => {
+const postLogout = async (req, res, next) => {
   try {
     const authHeader = req.get('Authorization');
     const token = authHeader.split(' ')[1];
@@ -23,9 +19,7 @@ const postLogout = async (req, res) => {
 
     return res.status(201).send({ message: 'Logged out user' });
   } catch (error) {
-    console.error(error);
-    logError(error, __filename, 'postLogout');
-    return res.status(500).send({ message: 'Internal Service Error' });
+    return next(error);
   }
 };
 
