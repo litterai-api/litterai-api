@@ -3,8 +3,7 @@ import { ObjectId } from 'mongodb';
 
 import { getUserCollection } from '../DB/collections.js';
 import CategoryCount from './CategoryCount.js';
-
-import logError from '../Errors/log-error.js';
+import errorHelpers from './helpers/errorHelpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -18,13 +17,13 @@ const User = {
   findByEmail: async (email) => {
     const sanitizedEmail = email.toLowerCase().trim();
     try {
-      const userDoc = await usersCollection.findOne({ email: sanitizedEmail });
-      return userDoc;
+      return await usersCollection.findOne({ email: sanitizedEmail });
     } catch (error) {
-      await logError(error, __filename, 'User.findByEmail');
-      error.statusCode = 500;
-      error.message = `Internal Service Error: ${error.message}`;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'User.findByEmail',
+      );
     }
   },
 
@@ -34,28 +33,27 @@ const User = {
       if (typeof _id === 'string') {
         userId = new ObjectId(_id);
       }
-      const userDoc = await usersCollection.findOne({ _id: userId });
-      return userDoc;
+      return await usersCollection.findOne({ _id: userId });
     } catch (error) {
-      await logError(error, __filename, 'User.findById');
-
-      error.statusCode = 500;
-      error.message = `Internal Service Error: ${error.message}`;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'User.findById',
+      );
     }
   },
 
   findByUsername: async (username) => {
     try {
-      const userDoc = await usersCollection.findOne({
-        username: username.toLowerCase(),
+      return await usersCollection.findOne({
+        username: username.toLowerCase().trim(),
       });
-      return userDoc;
     } catch (error) {
-      await logError(error, __filename, 'User.findByUsername');
-      error.statusCode = 500;
-      error.message = `Internal Service Error: ${error.message}`;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'User.findByUsername',
+      );
     }
   },
 
@@ -121,10 +119,11 @@ const User = {
         zipCode: payload.zipCode,
       };
     } catch (error) {
-      await logError(error, __filename, 'User.create');
-      error.message = `Database operation failed: ${error.message}`;
-      error.statusCode = 500;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'User.create',
+      );
     }
   },
 };

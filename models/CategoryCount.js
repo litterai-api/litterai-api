@@ -1,8 +1,7 @@
 import { fileURLToPath } from 'url';
 import { ObjectId } from 'mongodb';
 import { getCatCountCollection } from '../DB/collections.js';
-
-import logError from '../Errors/log-error.js';
+import errorHelpers from './helpers/errorHelpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 /**
@@ -34,10 +33,11 @@ const CategoryCount = {
 
       catCountCollection.insertOne(payload);
     } catch (error) {
-      await logError(error, __filename, 'CategoryCount.create');
-      error.message = `Database operation failed: ${error.message}`;
-      error.statusCode = 500;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'CategoryCount.create',
+      );
     }
   },
 
@@ -94,10 +94,11 @@ const CategoryCount = {
         [`pictureData.${category}`]: { $gt: 0 },
       });
     } catch (error) {
-      await logError(error, __filename, 'CategoryCount.findByUserId');
-      error.message = `Database operation failed: ${error.message}`;
-      error.statusCode = 500;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'CategoryCount.getLeaderboardByCategory',
+      );
     }
 
     return { leaderboard: result, totalEntries };
@@ -123,14 +124,11 @@ const CategoryCount = {
       );
       return categoryCountDocument;
     } catch (error) {
-      await logError(
+      throw await errorHelpers.transformDatabaseError(
         error,
         __filename,
-        'CategoryCount.getLeaderboardByCategory',
+        'CategoryCount.findByUserId',
       );
-      error.message = `Database operation failed: ${error.message}`;
-      error.statusCode = 500;
-      throw error;
     }
   },
 
@@ -156,14 +154,11 @@ const CategoryCount = {
       );
       return categoryDocument;
     } catch (error) {
-      await logError(
+      throw await errorHelpers.transformDatabaseError(
         error,
         __filename,
         'CategoryCount.incrementCategoryByUserId',
       );
-      error.message = `Database operation failed: ${error.message}`;
-      error.statusCode = 500;
-      throw error;
     }
   },
 };

@@ -2,8 +2,7 @@ import { fileURLToPath } from 'url';
 import { ObjectId } from 'mongodb';
 import { getUploadInfoCollection } from '../DB/collections.js';
 import CategoryCount from './CategoryCount.js';
-
-import logError from '../Errors/log-error.js';
+import errorHelpers from './helpers/errorHelpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -37,10 +36,11 @@ const PhotoInfo = {
         createdAt: Date.now(),
       });
     } catch (error) {
-      await logError(error, __filename, 'PhotoInfo.insertOne');
-      error.message = `Database operation failed: ${error.message}`;
-      error.statusCode = 500;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'PhotoInfo.insertOne',
+      );
     }
     // Update user's category count collection
     const categoryDocument = await CategoryCount.incrementCategoryByUserId(
