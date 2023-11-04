@@ -10,7 +10,7 @@ authRoutes.post('/register', authController.postRegister);
 authRoutes.post('/login', authController.postLogin);
 authRoutes.post('/logout', isAuth, authController.postLogout);
 authRoutes.get('/validate-token', isAuth, (req, res) => {
-  res.json({ message: 'Token is valid.' });
+  res.json({ status: 'success', message: 'Token is valid.' });
 });
 
 export default authRoutes;
