@@ -19,7 +19,7 @@ const postLogin = async (req, res, next) => {
 
     const result = await loginUserService(req.body);
 
-    return res.status(201).send(result);
+    return res.status(200).send(result);
   } catch (error) {
     return next(error);
   }
