@@ -11,14 +11,32 @@ const __filename = fileURLToPath(import.meta.url);
 const blacklistCollection = getBlacklistCollection;
 
 const BlacklistToken = {
-  addTokenToList: async (token) => {
+  addTokenToList: async (token, expires) => {
     try {
-      await blacklistCollection.insertOne({ token });
+      await blacklistCollection.insertOne({
+        token,
+        expires: Date.now(expires * 1000),
+      });
     } catch (error) {
       throw await errorHelpers.transformDatabaseError(
         error,
         __filename,
         'addTokenToList',
+      );
+    }
+  },
+
+  getToken: async (token) => {
+    try {
+      return await blacklistCollection.findOne(
+        { token },
+        { projection: { token: 1 } },
+      );
+    } catch (error) {
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'findOne',
       );
     }
   },
