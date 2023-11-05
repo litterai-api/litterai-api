@@ -46,19 +46,35 @@ const CategoryCount = {
     const aggregatePipelinePrefix = [
       {
         $match: {
-          [`pictureData.${category}`]: { $gt: 0 },
-        },
-      },
-      {
-        $project: {
-          username: 1,
-          displayUsername: 1,
-          itemCount: `$pictureData.${category}`,
+          [`pictureData.${category}`]: {
+            $gt: 1,
+          },
         },
       },
       {
         $sort: {
-          itemCount: -1,
+          [`pictureData.${category}`]: -1,
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: {
+          path: '$user',
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          username: '$user.username',
+          displayUsername: '$user.displayUsername',
+          itemCount: `$pictureData.${category}`,
         },
       },
     ];
