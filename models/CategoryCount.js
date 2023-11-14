@@ -47,7 +47,7 @@ const CategoryCount = {
       {
         $match: {
           [`pictureData.${category}`]: {
-            $gt: 1,
+            $gt: 0,
           },
         },
       },
