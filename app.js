@@ -11,7 +11,7 @@ import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
-const { JWT_SECRET, MONGO_URI, SERVER_PORT } = process.env;
+const { JWT_SECRET, MONGO_URI, SERVER_PORT, NODE_ENV } = process.env;
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -43,11 +43,14 @@ const startServer = async () => {
     app.use('/photo', routes.photo);
 
     app.use(errorHandler);
-    app.listen(PORT, () => {
-      console.log(
-        `Server started on port: ${PORT}\nConnected to db: ${db.databaseName}`,
-      );
-    });
+
+    if (NODE_ENV !== 'test') {
+      app.listen(PORT, () => {
+        console.log(
+          `Server started on port: ${PORT}\nConnected to db: ${db.databaseName}`,
+        );
+      });
+    }
   } catch (error) {
     await logError(error, __filename, 'startServer');
     console.log(error);
@@ -55,3 +58,5 @@ const startServer = async () => {
 };
 
 startServer();
+
+export default app;
