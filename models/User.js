@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import { getUserCollection } from '../DB/collections.js';
 import CategoryCount from './CategoryCount.js';
 import errorHelpers from './helpers/errorHelpers.js';
+import PhotoInfo from './PhotoInfo.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -150,6 +151,13 @@ const User = {
     }
     try {
       const user = await usersCollection.deleteOne({ _id: idObject || _id });
+
+      if (user.deletedCount === 0) {
+        return false;
+      }
+
+      await PhotoInfo.deleteSingleUsersInfo(_id);
+      await CategoryCount.deleteUserInfo(_id);
       return user.acknowledged;
     } catch (error) {
       throw await errorHelpers.transformDatabaseError(
