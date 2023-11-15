@@ -11,9 +11,16 @@ const __filename = fileURLToPath(import.meta.url);
  * @type {import('mongodb').Collection}
  */
 
-const usersCollection = getUserCollection;
+let usersCollection = getUserCollection;
 
 const User = {
+  injectDB: (db) => {
+    if (usersCollection) {
+      return;
+    }
+    usersCollection = db.collection('users');
+  },
+
   findByEmail: async (email) => {
     const sanitizedEmail = email.toLowerCase().trim();
     try {
@@ -77,6 +84,15 @@ const User = {
       error.statusCode = 400;
       throw error;
     }
+
+    if (
+      (await User.findByEmail(email)) ||
+      (await User.findByUsername(displayUsername.toLowerCase()))
+    ) {
+      const error = new Error('Username or Email already in use');
+      error.statusCode = 409;
+      throw error;
+    }
     // Sanitize data
     const trimmedFirstName = firstName.trim();
     const trimmedLastName = lastName.trim();
@@ -123,6 +139,23 @@ const User = {
         error,
         __filename,
         'User.create',
+      );
+    }
+  },
+
+  delete: async (_id) => {
+    let idObject;
+    if (typeof _id === 'string') {
+      idObject = new ObjectId(_id);
+    }
+    try {
+      const user = await usersCollection.deleteOne({ _id: idObject || _id });
+      return user.acknowledged;
+    } catch (error) {
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'User.delete',
       );
     }
   },
