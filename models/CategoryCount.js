@@ -1,6 +1,9 @@
+import { fileURLToPath } from 'url';
 import { ObjectId } from 'mongodb';
 import { getCatCountCollection } from '../DB/collections.js';
+import errorHelpers from './helpers/errorHelpers.js';
 
+const __filename = fileURLToPath(import.meta.url);
 /**
  * @type {import('mongodb').Collection}
  */
@@ -30,9 +33,11 @@ const CategoryCount = {
 
       catCountCollection.insertOne(payload);
     } catch (error) {
-      error.message = `Database operation failed: ${error.message}`;
-      error.statusCode = 500;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'CategoryCount.create',
+      );
     }
   },
 
@@ -41,19 +46,35 @@ const CategoryCount = {
     const aggregatePipelinePrefix = [
       {
         $match: {
-          [`pictureData.${category}`]: { $gt: 0 },
-        },
-      },
-      {
-        $project: {
-          username: 1,
-          displayUsername: 1,
-          itemCount: `$pictureData.${category}`,
+          [`pictureData.${category}`]: {
+            $gt: 0,
+          },
         },
       },
       {
         $sort: {
-          itemCount: -1,
+          [`pictureData.${category}`]: -1,
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: {
+          path: '$user',
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          username: '$user.username',
+          displayUsername: '$user.displayUsername',
+          itemCount: `$pictureData.${category}`,
         },
       },
     ];
@@ -89,9 +110,11 @@ const CategoryCount = {
         [`pictureData.${category}`]: { $gt: 0 },
       });
     } catch (error) {
-      error.message = `Database operation failed: ${error.message}`;
-      error.statusCode = 500;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'CategoryCount.getLeaderboardByCategory',
+      );
     }
 
     return { leaderboard: result, totalEntries };
@@ -117,9 +140,11 @@ const CategoryCount = {
       );
       return categoryCountDocument;
     } catch (error) {
-      error.message = `Database operation failed: ${error.message}`;
-      error.statusCode = 500;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'CategoryCount.findByUserId',
+      );
     }
   },
 
@@ -145,9 +170,11 @@ const CategoryCount = {
       );
       return categoryDocument;
     } catch (error) {
-      error.message = `Database operation failed: ${error.message}`;
-      error.statusCode = 500;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'CategoryCount.incrementCategoryByUserId',
+      );
     }
   },
 };

@@ -1,7 +1,11 @@
+import { fileURLToPath } from 'url';
 import { ObjectId } from 'mongodb';
 
 import { getUserCollection } from '../DB/collections.js';
 import CategoryCount from './CategoryCount.js';
+import errorHelpers from './helpers/errorHelpers.js';
+
+const __filename = fileURLToPath(import.meta.url);
 
 /**
  * @type {import('mongodb').Collection}
@@ -13,12 +17,13 @@ const User = {
   findByEmail: async (email) => {
     const sanitizedEmail = email.toLowerCase().trim();
     try {
-      const userDoc = await usersCollection.findOne({ email: sanitizedEmail });
-      return userDoc;
+      return await usersCollection.findOne({ email: sanitizedEmail });
     } catch (error) {
-      error.statusCode = 500;
-      error.message = `Internal Service Error: ${error.message}`;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'User.findByEmail',
+      );
     }
   },
 
@@ -28,25 +33,27 @@ const User = {
       if (typeof _id === 'string') {
         userId = new ObjectId(_id);
       }
-      const userDoc = await usersCollection.findOne({ _id: userId });
-      return userDoc;
+      return await usersCollection.findOne({ _id: userId });
     } catch (error) {
-      error.statusCode = 500;
-      error.message = `Internal Service Error: ${error.message}`;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'User.findById',
+      );
     }
   },
 
   findByUsername: async (username) => {
     try {
-      const userDoc = await usersCollection.findOne({
-        username: username.toLowerCase(),
+      return await usersCollection.findOne({
+        username: username.toLowerCase().trim(),
       });
-      return userDoc;
     } catch (error) {
-      error.statusCode = 500;
-      error.message = `Internal Service Error: ${error.message}`;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'User.findByUsername',
+      );
     }
   },
 
@@ -112,9 +119,11 @@ const User = {
         zipCode: payload.zipCode,
       };
     } catch (error) {
-      error.message = `Database operation failed: ${error.message}`;
-      error.statusCode = 500;
-      throw error;
+      throw await errorHelpers.transformDatabaseError(
+        error,
+        __filename,
+        'User.create',
+      );
     }
   },
 };

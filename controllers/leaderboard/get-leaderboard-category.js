@@ -1,10 +1,6 @@
-import { fileURLToPath } from 'url';
 import Joi from 'joi';
 
-import logError from '../../Errors/log-error.js';
 import categoryLeaderboardService from '../../services/leaderboard/category-leaderboard.js';
-
-const __filename = fileURLToPath(import.meta.url);
 
 const paramSchema = Joi.string()
   .valid(
@@ -24,7 +20,7 @@ const paramSchema = Joi.string()
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  */
-const getLeaderboardByCategory = async (req, res) => {
+const getLeaderboardByCategory = async (req, res, next) => {
   const { category } = req.params;
   const page = parseInt(req.query.page, 10) || 1;
   const perPage = parseInt(req.query.perPage, 10) || 10;
@@ -53,16 +49,7 @@ const getLeaderboardByCategory = async (req, res) => {
     // Return successful request
     return res.status(200).send(result);
   } catch (error) {
-    console.log(error);
-
-    // Log the error
-    logError(error, __filename, 'postRegister');
-
-    // If a custom error was created use it
-    if (error.statusCode) {
-      return res.status(error.statusCode).send({ message: error.message });
-    }
-    return res.status(500).send({ message: 'Internal Service Error' });
+    return next(error);
   }
 };
 
