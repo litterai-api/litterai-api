@@ -75,11 +75,11 @@ const PhotoInfo = {
 
   getAllUsersPhotoInfo: async (userId) => {
     let userObjectId;
-    if (typeof userId === 'string') {
-      userObjectId = new ObjectId(userId);
-    }
-
     try {
+      if (typeof userId === 'string') {
+        userObjectId = new ObjectId(userId);
+      }
+
       const results = await photoInfoCollection
         .find({ userId: userObjectId || userId })
         .toArray();
