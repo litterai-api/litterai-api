@@ -9,12 +9,15 @@ const __filename = fileURLToPath(import.meta.url);
 /**
  * @type {import('mongodb').Collection}
  */
-const photoInfoCollection = getUploadInfoCollection;
-/**
- * @type {import('mongodb').Collection}
- */
+let photoInfoCollection = getUploadInfoCollection;
 
 const PhotoInfo = {
+  injectDB: (db) => {
+    if (process.env.NODE_ENV === 'test') {
+      photoInfoCollection = db.collection('uploadsinfo');
+    }
+  },
+
   /**
    * @typedef {Object} User
    * @property {string} username
@@ -27,10 +30,14 @@ const PhotoInfo = {
    * @param {User} user
    */
   insertOne: async (categoryString, user) => {
+    if (typeof user._id === 'string') {
+      // eslint-disable-next-line no-param-reassign
+      user._id = new ObjectId(user._id);
+    }
     try {
       // Insert new photoInfo document
       await photoInfoCollection.insertOne({
-        userId: new ObjectId(user._id),
+        userId: user._id,
         username: user.username,
         category: categoryString,
         createdAt: Date.now(),
@@ -43,6 +50,7 @@ const PhotoInfo = {
       );
     }
     // Update user's category count collection
+
     const categoryDocument = await CategoryCount.incrementCategoryByUserId(
       categoryString,
       user._id,
@@ -63,6 +71,39 @@ const PhotoInfo = {
       categoryUploads: categoryDocument.pictureData[categoryString],
       totalUploads: categoryDocument.totalUploads,
     };
+  },
+
+  getAllUsersPhotoInfo: async (userId) => {
+    let userObjectId;
+    if (typeof userId === 'string') {
+      userObjectId = new ObjectId(userId);
+    }
+
+    try {
+      const results = await photoInfoCollection
+        .find({ userId: userObjectId || userId })
+        .toArray();
+      return results || [];
+    } catch (error) {
+      error.statusCode = 500;
+      throw error;
+    }
+  },
+
+  deleteSingleUsersInfo: async (userId) => {
+    let userObjectId;
+    if (typeof userId === 'string') {
+      userObjectId = new ObjectId(userId);
+    }
+    try {
+      const result = await photoInfoCollection.deleteMany({
+        userId: userObjectId || userId,
+      });
+      return result.acknowledged;
+    } catch (error) {
+      error.statusCode = 500;
+      throw error;
+    }
   },
 };
 
