@@ -7,10 +7,20 @@ const __filename = fileURLToPath(import.meta.url);
 /**
  * @type {import('mongodb').Collection}
  */
-const catCountCollection = getCatCountCollection;
+let catCountCollection = getCatCountCollection;
 
 const CategoryCount = {
+  injectDB: (db) => {
+    if (process.env.NODE_ENV === 'test') {
+      catCountCollection = db.collection('categoryCounts');
+    }
+  },
+
   create: async (userId, username, displayUsername, email) => {
+    if (typeof userId === 'string') {
+      // eslint-disable-next-line no-param-reassign
+      userId = new ObjectId(userId);
+    }
     try {
       const payload = {
         userId,
@@ -30,8 +40,9 @@ const CategoryCount = {
         },
         totalUploads: 0,
       };
+      const result = await catCountCollection.insertOne(payload);
 
-      catCountCollection.insertOne(payload);
+      return result;
     } catch (error) {
       throw await errorHelpers.transformDatabaseError(
         error,
@@ -175,6 +186,22 @@ const CategoryCount = {
         __filename,
         'CategoryCount.incrementCategoryByUserId',
       );
+    }
+  },
+
+  deleteUserInfo: async (userId) => {
+    let userObjectId;
+    if (typeof userId === 'string') {
+      userObjectId = new ObjectId(userId);
+    }
+    try {
+      const result = await catCountCollection.deleteOne({
+        userId: userObjectId || userId,
+      });
+      return result.acknowledged;
+    } catch (error) {
+      error.statusCode = 500;
+      throw error;
     }
   },
 };
