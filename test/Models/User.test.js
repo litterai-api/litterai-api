@@ -6,52 +6,52 @@ import chai from 'chai';
 import User from '../../models/User.js';
 import PhotoInfo from '../../models/PhotoInfo.js';
 import CategoryCount from '../../models/CategoryCount.js';
+import { closeDB } from '../../DB/db-connection.js';
 
 const { expect } = chai;
-let mongoServer;
-let client;
-let db;
-let newUser;
-
-let userDeleteTest;
 
 const convertIdToString = (user) => ({
   ...user,
   _id: user._id.toHexString(),
 });
 
-before(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-
-  client = new MongoClient(uri);
-  await client.connect();
-  db = client.db('testDB');
-
-  PhotoInfo.injectDB(db);
-  CategoryCount.injectDB(db);
-  User.injectDB(db);
-
-  const newUserPassword = faker.internet.password();
-  newUser = await User.create(
-    faker.internet.userName(),
-    faker.internet.email(),
-    newUserPassword,
-    faker.person.firstName(),
-    faker.person.lastName(),
-    faker.location.zipCode('#####'),
-  );
-
-  newUser = { ...newUser, password: newUserPassword };
-});
-
-after(async () => {
-  User.delete(newUser._id);
-  await client.close();
-  await mongoServer.stop();
-});
-
 describe('User Model', () => {
+  let mongoServer;
+  let client;
+  let db;
+  let newUser;
+
+  let userDeleteTest;
+  before(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    client = new MongoClient(uri);
+    await client.connect();
+    db = client.db('testDB');
+
+    PhotoInfo.injectDB(db);
+    CategoryCount.injectDB(db);
+    User.injectDB(db);
+
+    const newUserPassword = faker.internet.password();
+    newUser = await User.create(
+      faker.internet.userName(),
+      faker.internet.email(),
+      newUserPassword,
+      faker.person.firstName(),
+      faker.person.lastName(),
+      faker.location.zipCode('#####'),
+    );
+
+    newUser = { ...newUser, password: newUserPassword };
+  });
+
+  after(async () => {
+    User.delete(newUser._id);
+    await closeDB();
+    await client.close();
+    await mongoServer.stop();
+  });
   describe('findByEmail', () => {
     it('should find a user by email', async () => {
       const user = await User.findByEmail(newUser.email);
