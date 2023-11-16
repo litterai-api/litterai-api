@@ -16,10 +16,9 @@ let usersCollection = getUserCollection;
 
 const User = {
   injectDB: (db) => {
-    if (usersCollection) {
-      return;
+    if (process.env.NODE_ENV === 'test') {
+      usersCollection = db.collection('users');
     }
-    usersCollection = db.collection('users');
   },
 
   findByEmail: async (email) => {
