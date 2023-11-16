@@ -32,7 +32,11 @@ export const getDb = async () => {
 };
 
 export const closeDB = async () => {
-  if (_client.isConnected()) {
-    await _client.close();
+  if (_client) {
+    try {
+      await _client.close();
+    } catch (error) {
+      console.error('Error closing the database connection:', error);
+    }
   }
 };
