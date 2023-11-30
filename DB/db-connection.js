@@ -9,34 +9,34 @@ let _db;
 let _client;
 
 export const mongoConnect = async () => {
-  try {
-    _client = await MongoClient.connect(MONGO_URI);
-    _db = _client.db(dbName);
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+    try {
+        _client = await MongoClient.connect(MONGO_URI);
+        _db = _client.db(dbName);
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
 };
 
 export const getDb = async () => {
-  if (_db) {
-    return _db;
-  }
-  try {
-    await mongoConnect();
-    return _db;
-  } catch (error) {
-    console.log(error);
-    throw new Error('Error connecting to the database');
-  }
+    if (_db) {
+        return _db;
+    }
+    try {
+        await mongoConnect();
+        return _db;
+    } catch (error) {
+        console.log(error);
+        throw new Error('Error connecting to the database');
+    }
 };
 
 export const closeDB = async () => {
-  if (_client) {
-    try {
-      await _client.close();
-    } catch (error) {
-      console.error('Error closing the database connection:', error);
+    if (_client) {
+        try {
+            await _client.close();
+        } catch (error) {
+            console.error('Error closing the database connection:', error);
+        }
     }
-  }
 };

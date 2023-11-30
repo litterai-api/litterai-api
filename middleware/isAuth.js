@@ -23,57 +23,61 @@ const { JWT_SECRET } = process.env;
 
 // TODO: ALWAYS INCLUDE AN INDEX FOR TOKEN, DO THIS IN COMPASS!
 const isAuth = async (req, res, next) => {
-  const authTokenSchema = Joi.string().pattern(/^Bearer /);
+    const authTokenSchema = Joi.string().pattern(/^Bearer /);
 
-  const authHeader = req.get('Authorization');
-  if (!authHeader) {
-    return res.status(422).send({
-      status: 'error',
-      message: 'Authentication token is required for this endpoint.',
-    });
-  }
-
-  const { error } = authTokenSchema.validate(authHeader);
-  if (error) {
-    return res.status(422).send({
-      status: 'error',
-      message: "Authorization header must begin with 'Bearer'",
-    });
-  }
-
-  const authToken = authHeader.split(' ')[1];
-  const isBlacklisted = await BlacklistToken.getToken(authToken);
-
-  try {
-    if (isBlacklisted) {
-      return res
-        .status(401)
-        .send({ status: 'error', message: 'Invalid Token' });
+    const authHeader = req.get('Authorization');
+    if (!authHeader) {
+        return res.status(422).send({
+            status: 'error',
+            message: 'Authentication token is required for this endpoint.',
+        });
     }
-  } catch (err) {
-    console.log(err);
-    logError(err, __filename, 'isAuth');
-    return res
-      .status(500)
-      .send({ status: 'error', message: 'Internal Service Error' });
-  }
 
-  let decodedToken;
-  try {
-    decodedToken = jwt.verify(authToken, JWT_SECRET);
-  } catch (err) {
-    console.log(err);
-    return res
-      .status(401)
-      .send({ status: 'error', message: 'Unauthorized', error: err.message });
-  }
+    const { error } = authTokenSchema.validate(authHeader);
+    if (error) {
+        return res.status(422).send({
+            status: 'error',
+            message: "Authorization header must begin with 'Bearer'",
+        });
+    }
 
-  if (!decodedToken) {
-    return res.status(401).send({ status: 'error', message: 'Unauthorized' });
-  }
+    const authToken = authHeader.split(' ')[1];
+    const isBlacklisted = await BlacklistToken.getToken(authToken);
 
-  req.user = decodedToken;
-  return next();
+    try {
+        if (isBlacklisted) {
+            return res
+                .status(401)
+                .send({ status: 'error', message: 'Invalid Token' });
+        }
+    } catch (err) {
+        console.log(err);
+        logError(err, __filename, 'isAuth');
+        return res
+            .status(500)
+            .send({ status: 'error', message: 'Internal Service Error' });
+    }
+
+    let decodedToken;
+    try {
+        decodedToken = jwt.verify(authToken, JWT_SECRET);
+    } catch (err) {
+        console.log(err);
+        return res.status(401).send({
+            status: 'error',
+            message: 'Unauthorized',
+            error: err.message,
+        });
+    }
+
+    if (!decodedToken) {
+        return res
+            .status(401)
+            .send({ status: 'error', message: 'Unauthorized' });
+    }
+
+    req.user = decodedToken;
+    return next();
 };
 
 export default isAuth;
