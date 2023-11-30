@@ -11,47 +11,52 @@ import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
-const { JWT_SECRET, MONGO_URI, SERVER_PORT } = process.env;
+const { JWT_SECRET, MONGO_URI, SERVER_PORT, NODE_ENV } = process.env;
 
 const __filename = fileURLToPath(import.meta.url);
 
 const PORT = SERVER_PORT || 3000;
 
 const startServer = async () => {
-  try {
-    await mongoConnect();
-    const db = await getDb();
+    try {
+        await mongoConnect();
+        const db = await getDb();
 
-    app.use(morgan('dev'));
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
+        app.use(morgan('dev'));
+        app.use(express.json());
+        app.use(express.urlencoded({ extended: true }));
 
-    app.use((req, res, next) => {
-      if (!JWT_SECRET || !MONGO_URI) {
-        return res.status(500).send({
-          message: 'Internal Service Error',
-          error: 'Server missing Database Connection String or Secret',
+        app.use((req, res, next) => {
+            if (!JWT_SECRET || !MONGO_URI) {
+                return res.status(500).send({
+                    message: 'Internal Service Error',
+                    error: 'Server missing Database Connection String or Secret',
+                });
+            }
+            return next();
         });
-      }
-      return next();
-    });
 
-    // Routes
-    app.use('/', routes.auth);
-    app.use('/leaderboard', routes.leaderboard);
-    // app.use(isAuth);
-    app.use('/photo', routes.photo);
+        // Routes
+        app.use('/', routes.auth);
+        app.use('/leaderboard', routes.leaderboard);
+        // app.use(isAuth);
+        app.use('/photo', routes.photo);
 
-    app.use(errorHandler);
-    app.listen(PORT, () => {
-      console.log(
-        `Server started on port: ${PORT}\nConnected to db: ${db.databaseName}`,
-      );
-    });
-  } catch (error) {
-    await logError(error, __filename, 'startServer');
-    console.log(error);
-  }
+        app.use(errorHandler);
+
+        if (NODE_ENV !== 'test') {
+            app.listen(PORT, () => {
+                console.log(
+                    `Server started on port: ${PORT}\nConnected to db: ${db.databaseName}`,
+                );
+            });
+        }
+    } catch (error) {
+        await logError(error, __filename, 'startServer');
+        console.log(error);
+    }
 };
 
 startServer();
+
+export default app;

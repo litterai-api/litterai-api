@@ -5,15 +5,15 @@ import extractUser from '../middleware/extractUser.js';
 const leaderboardRoutes = express.Router();
 
 leaderboardRoutes.get(
-  '/',
-  extractUser,
-  leaderboardController.getLeaderboardByTotal,
+    '/',
+    extractUser,
+    leaderboardController.getLeaderboardByTotal,
 );
 
 leaderboardRoutes.get(
-  '/:category',
-  extractUser,
-  leaderboardController.getLeaderboardByCategory,
+    '/:category',
+    extractUser,
+    leaderboardController.getLeaderboardByCategory,
 );
 
 export default leaderboardRoutes;
