@@ -53,75 +53,160 @@ const CategoryCount = {
         }
     },
 
-    getLeaderboardByCategory: async (category, page, perPage) => {
-        // Create an aggregation pipeline prefix
-        const aggregatePipelinePrefix = [
+    getLeaderboardByCategory: async ({
+        category,
+        page,
+        perPage,
+        userId = null,
+    }) => {
+        let includeLoggedInUserPipeline = false;
+        if (userId) {
+            includeLoggedInUserPipeline = true;
+        }
+
+        let userObjectId;
+        if (typeof userId === 'string') {
+            userObjectId = new ObjectId(userId);
+        }
+
+        const startIndex = (page - 1) * perPage;
+
+        const pipeline = [
             {
-                $match: {
-                    [`pictureData.${category}`]: {
-                        $gt: 0,
-                    },
-                },
-            },
-            {
-                $sort: {
-                    [`pictureData.${category}`]: -1,
-                },
-            },
-            {
-                $lookup: {
-                    from: 'users',
-                    localField: 'userId',
-                    foreignField: '_id',
-                    as: 'user',
-                },
-            },
-            {
-                $unwind: {
-                    path: '$user',
+                $facet: {
+                    // Branch for full leaderboard
+                    leaderboard: [
+                        {
+                            $match: {
+                                [`pictureData.${category}`]: { $gt: 0 },
+                            },
+                        },
+                        {
+                            $group: {
+                                _id: '$userId',
+                                itemCount: { $sum: `$pictureData.${category}` },
+                            },
+                        },
+                        {
+                            $lookup: {
+                                from: 'users',
+                                localField: '_id',
+                                foreignField: '_id',
+                                as: 'userInfo',
+                            },
+                        },
+                        { $unwind: '$userInfo' },
+                        {
+                            $project: {
+                                userId: '$_id',
+                                _id: 0,
+                                username: '$userInfo.username',
+                                displayUsername: '$userInfo.displayUsername',
+                                itemCount: 1,
+                            },
+                        },
+                        { $sort: { itemCount: -1 } },
+                        {
+                            $group: {
+                                _id: null,
+                                data: { $push: '$$ROOT' },
+                            },
+                        },
+                        {
+                            $unwind: {
+                                path: '$data',
+                                includeArrayIndex: 'data.rank',
+                            },
+                        },
+                        { $replaceRoot: { newRoot: '$data' } },
+                        {
+                            $project: {
+                                username: '$displayUsername',
+                                itemCount: 1,
+                                rank: { $add: ['$rank', 1] },
+                            },
+                        },
+                    ],
+                    // Conditional inclusion of loggedInUser
+                    // prettier-ignore
+                    ...(includeLoggedInUserPipeline ? {
+                        loggedInUser: [
+                            { $sort: { itemCount: -1 } },
+                            {
+                                $group: {
+                                    _id: null,
+                                    data: { $push: '$$ROOT' },
+                                },
+                            },
+                            {
+                                $unwind: {
+                                    path: '$data',
+                                    includeArrayIndex: 'data.rank',
+                                },
+                            },
+                            { $replaceRoot: { newRoot: '$data' } },
+                            { $match: { userId: userObjectId } },
+                            {
+                                $project: {
+                                    username: '$displayUsername',
+                                    totalUploads: 1,
+                                    rank: {
+                                        $cond: {
+                                            if: {
+                                                $eq: [
+                                                    `$pictureData.${category}`,
+                                                    0,
+                                                ],
+                                            },
+                                            then: -1,
+                                            else: '$rank',
+                                        },
+                                    },
+                                },
+                            },
+                        ],
+                    }
+                        : {}),
                 },
             },
             {
                 $project: {
-                    _id: 0,
-                    username: '$user.username',
-                    displayUsername: '$user.displayUsername',
-                    itemCount: `$pictureData.${category}`,
+                    leaderboard: '$leaderboard',
+                    loggedInUser: { $arrayElemAt: ['$loggedInUser', 0] },
                 },
             },
         ];
-        // Declare leaderboard result and total entries
-        let result;
-        let totalEntries;
 
         try {
-            // If called without page and perPage argument
-            // assume they want the whole leaderboard and do not need total entries.
-            if (!page && !perPage) {
-                // query db
-                result = await catCountCollection
-                    .aggregate(aggregatePipelinePrefix)
-                    .toArray();
-                return { leaderboard: result };
-            }
-            // eslint-disable-next-line max-len
-            // If page and perPage were entered return a section of the leaderboard and total entries
-            const startIndex = (page - 1) * perPage;
-            // append steps to the aggregation pipeline
-            const aggregationPipeline = [
-                ...aggregatePipelinePrefix,
-                { $skip: startIndex },
-                { $limit: perPage },
-            ];
-
-            // query db
-            result = await catCountCollection
-                .aggregate(aggregationPipeline)
+            const [result] = await catCountCollection
+                .aggregate(pipeline)
                 .toArray();
 
-            totalEntries = await catCountCollection.countDocuments({
-                [`pictureData.${category}`]: { $gt: 0 },
-            });
+            let responseObject = {
+                category,
+            };
+            if (result.loggedInUser) {
+                responseObject = {
+                    ...responseObject,
+                    userRank: result.loggedInUser.rank,
+                    totalEntries: result.leaderboard.length,
+                    leaderboard: result.leaderboard.slice(
+                        startIndex,
+                        perPage + startIndex,
+                    ),
+                };
+            } else {
+                responseObject = {
+                    ...responseObject,
+                    userRank: null,
+                    totalEntries: result.leaderboard.length,
+                    leaderboard: result.leaderboard.slice(
+                        startIndex,
+                        perPage + startIndex,
+                    ),
+                };
+            }
+            return responseObject;
         } catch (error) {
             throw await errorHelpers.transformDatabaseError(
                 error,
@@ -129,8 +214,6 @@ const CategoryCount = {
                 'CategoryCount.getLeaderboardByCategory',
             );
         }
-
-        return { leaderboard: result, totalEntries };
     },
 
     findByUserId: async (_id) => {

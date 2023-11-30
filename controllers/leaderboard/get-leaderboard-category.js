@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-import categoryLeaderboardService from '../../services/leaderboard/category-leaderboard.js';
+import CategoryCount from '../../models/CategoryCount.js';
 
 const paramSchema = Joi.string()
     .valid(
@@ -40,12 +40,12 @@ const getLeaderboardByCategory = async (req, res, next) => {
         }
 
         // Execute service
-        const result = await categoryLeaderboardService(
+        const result = await CategoryCount.getLeaderboardByCategory({
             category,
             page,
             perPage,
-            user,
-        );
+            userId: user?._id,
+        });
 
         // Return successful request
         return res.status(200).send(result);
