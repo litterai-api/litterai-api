@@ -1,5 +1,5 @@
 import express from 'express';
-import leaderboardController from '../controllers/leaderboard/index.js';
+import controllers from '../controllers/index.js';
 import extractUser from '../middleware/extractUser.js';
 
 const leaderboardRoutes = express.Router();
@@ -7,13 +7,13 @@ const leaderboardRoutes = express.Router();
 leaderboardRoutes.get(
     '/',
     extractUser,
-    leaderboardController.getLeaderboardByTotal,
+    controllers.leaderboard.getLeaderboardByTotal,
 );
 
 leaderboardRoutes.get(
     '/:category',
     extractUser,
-    leaderboardController.getLeaderboardByCategory,
+    controllers.leaderboard.getLeaderboardByCategory,
 );
 
 export default leaderboardRoutes;
