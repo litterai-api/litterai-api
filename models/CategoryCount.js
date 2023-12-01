@@ -131,6 +131,35 @@ const CategoryCount = {
                     // prettier-ignore
                     ...(includeLoggedInUserPipeline ? {
                         loggedInUser: [
+                            {
+                                $match: {
+                                    [`pictureData.${category}`]: { $gt: 0 },
+                                },
+                            },
+                            {
+                                $group: {
+                                    _id: '$userId',
+                                    itemCount: { $sum: `$pictureData.${category}` },
+                                },
+                            },
+                            {
+                                $lookup: {
+                                    from: 'users',
+                                    localField: '_id',
+                                    foreignField: '_id',
+                                    as: 'userInfo',
+                                },
+                            },
+                            { $unwind: '$userInfo' },
+                            {
+                                $project: {
+                                    userId: '$_id',
+                                    _id: 0,
+                                    username: '$userInfo.username',
+                                    displayUsername: '$userInfo.displayUsername',
+                                    itemCount: 1,
+                                },
+                            },
                             { $sort: { itemCount: -1 } },
                             {
                                 $group: {
@@ -150,18 +179,8 @@ const CategoryCount = {
                                 $project: {
                                     username: '$displayUsername',
                                     totalUploads: 1,
-                                    rank: {
-                                        $cond: {
-                                            if: {
-                                                $eq: [
-                                                    `$pictureData.${category}`,
-                                                    0,
-                                                ],
-                                            },
-                                            then: -1,
-                                            else: '$rank',
-                                        },
-                                    },
+                                    itemCount: 1,
+                                    rank: { $add: ['$rank', 1] },
                                 },
                             },
                         ],
@@ -195,6 +214,18 @@ const CategoryCount = {
                         perPage + startIndex,
                     ),
                 };
+                // if there isnt a loggedInUser property, the user has no photos for that category
+            } else if (userId) {
+                responseObject = {
+                    ...responseObject,
+                    userRank: -1,
+                    totalEntries: result.leaderboard.length,
+                    leaderboard: result.leaderboard.slice(
+                        startIndex,
+                        perPage + startIndex,
+                    ),
+                };
+                // request was made by a user who is not logged in
             } else {
                 responseObject = {
                     ...responseObject,
