@@ -120,6 +120,44 @@ JSON Request body should follow
 
 </details>
 
+### Get Leaderboard by Total Uploads
+
+Returns a json object that contains a category, the logged in user's rank,
+
+**GET** `/leaderboard`
+
+**Query Params**
+
+| Syntax  | Description      | Default |
+| ------- | ---------------- | ------- |
+| page    | page to query    | 1       |
+| perPage | results per page | 10      |
+
+Ex: `/leaderboardpage=2&perPage=3`
+
+<details>
+<summary>Response</summary>
+
+When `userRank` is `null` a user is not logged in
+
+When `userRank` is `-1` the logged in user has not uploaded a photo of selected category
+
+```
+{
+    "category": <string>,
+    "userRank": <number>,
+    "totalEntries": <number>,
+    "leaderboard": [
+        {
+            "username": <string>,
+            "itemCount": <number>
+            "rank": <number>
+        }
+        // ...
+    ]
+}
+```
+
 ### Get Leaderboard by Category
 
 Returns a json object that contains a category, the logged in user's rank,
@@ -151,6 +189,7 @@ When `userRank` is `-1` the logged in user has not uploaded a photo of selected 
         {
             "username": <string>,
             "itemCount": <number>
+            "rank": <number>
         }
         // ...
     ]
