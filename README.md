@@ -133,7 +133,7 @@ Returns a json object that contains a category, the logged in user's rank,
 | page    | page to query    | 1       |
 | perPage | results per page | 10      |
 
-Ex: `/leaderboardpage=2&perPage=3`
+Ex: `/leaderboard?page=2&perPage=3`
 
 <details>
 <summary>Response</summary>
