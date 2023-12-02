@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-const postPhotoBodySchema = Joi.object({
+export const postPhotoBodySchema = Joi.object({
     category: Joi.string()
         .valid(
             'paper',
@@ -15,6 +15,10 @@ const postPhotoBodySchema = Joi.object({
         )
         .required(),
     email: Joi.string().email().required(),
+});
+
+export const getUserPhotoCountParamSchema = Joi.object({
+    userId: Joi.string().length(24).required(),
 });
 
 export default postPhotoBodySchema;

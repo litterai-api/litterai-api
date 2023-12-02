@@ -53,75 +53,134 @@ const CategoryCount = {
         }
     },
 
-    getLeaderboardByCategory: async (category, page, perPage) => {
-        // Create an aggregation pipeline prefix
-        const aggregatePipelinePrefix = [
+    getLeaderboardByCategory: async ({
+        category,
+        page,
+        perPage,
+        userId = null,
+    }) => {
+        let includeLoggedInUserPipeline = false;
+        if (userId) {
+            includeLoggedInUserPipeline = true;
+        }
+
+        let userObjectId;
+        if (typeof userId === 'string') {
+            userObjectId = new ObjectId(userId);
+        }
+
+        const startIndex = (page - 1) * perPage;
+        const sharedPipelineStages = [
+            { $match: { [`pictureData.${category}`]: { $gt: 0 } } },
             {
-                $match: {
-                    [`pictureData.${category}`]: {
-                        $gt: 0,
+                $project: {
+                    itemCount: `$pictureData.${category}`,
+                    username: '$displayUsername',
+                    userId: 1,
+                },
+            },
+            { $sort: { itemCount: -1 } },
+            {
+                $group: {
+                    _id: null,
+                    data: {
+                        $push: '$$ROOT',
                     },
                 },
             },
             {
-                $sort: {
-                    [`pictureData.${category}`]: -1,
-                },
-            },
-            {
-                $lookup: {
-                    from: 'users',
-                    localField: 'userId',
-                    foreignField: '_id',
-                    as: 'user',
-                },
-            },
-            {
                 $unwind: {
-                    path: '$user',
+                    path: '$data',
+                    includeArrayIndex: 'data.rank',
+                },
+            },
+            { $replaceRoot: { newRoot: '$data' } },
+        ];
+
+        const pipeline = [
+            {
+                $facet: {
+                    // Branch for full leaderboard
+                    leaderboard: [
+                        ...sharedPipelineStages,
+                        {
+                            $project: {
+                                _id: 0,
+                                username: 1,
+                                itemCount: 1,
+                                rank: { $add: ['$rank', 1] },
+                            },
+                        },
+                    ],
+                    // Conditional inclusion of loggedInUser
+                    // prettier-ignore
+                    ...(includeLoggedInUserPipeline ? {
+                        loggedInUser: [
+                            ...sharedPipelineStages,
+                            { $match: { userId: userObjectId } },
+                            {
+                                $project: {
+                                    _id: 0,
+                                    username: 1,
+                                    itemCount: 1,
+                                    rank: { $add: ['$rank', 1] },
+                                },
+                            },
+                        ],
+                    }
+                        : {}),
                 },
             },
             {
                 $project: {
-                    _id: 0,
-                    username: '$user.username',
-                    displayUsername: '$user.displayUsername',
-                    itemCount: `$pictureData.${category}`,
+                    leaderboard: '$leaderboard',
+                    loggedInUser: { $arrayElemAt: ['$loggedInUser', 0] },
                 },
             },
         ];
-        // Declare leaderboard result and total entries
-        let result;
-        let totalEntries;
 
         try {
-            // If called without page and perPage argument
-            // assume they want the whole leaderboard and do not need total entries.
-            if (!page && !perPage) {
-                // query db
-                result = await catCountCollection
-                    .aggregate(aggregatePipelinePrefix)
-                    .toArray();
-                return { leaderboard: result };
-            }
-            // eslint-disable-next-line max-len
-            // If page and perPage were entered return a section of the leaderboard and total entries
-            const startIndex = (page - 1) * perPage;
-            // append steps to the aggregation pipeline
-            const aggregationPipeline = [
-                ...aggregatePipelinePrefix,
-                { $skip: startIndex },
-                { $limit: perPage },
-            ];
-
-            // query db
-            result = await catCountCollection
-                .aggregate(aggregationPipeline)
+            const [result] = await catCountCollection
+                .aggregate(pipeline)
                 .toArray();
 
-            totalEntries = await catCountCollection.countDocuments({
-                [`pictureData.${category}`]: { $gt: 0 },
-            });
+            let responseData = {
+                category,
+            };
+            if (result.loggedInUser) {
+                responseData = {
+                    ...responseData,
+                    userRank: result.loggedInUser.rank,
+                    totalEntries: result.leaderboard.length,
+                    leaderboard: result.leaderboard.slice(
+                        startIndex,
+                        perPage + startIndex,
+                    ),
+                };
+                // if there isnt a loggedInUser property, the user has no photos for that category
+            } else if (userId) {
+                responseData = {
+                    ...responseData,
+                    userRank: -1,
+                    totalEntries: result.leaderboard.length,
+                    leaderboard: result.leaderboard.slice(
+                        startIndex,
+                        perPage + startIndex,
+                    ),
+                };
+                // request was made by a user who is not logged in
+            } else {
+                responseData = {
+                    ...responseData,
+                    userRank: null,
+                    totalEntries: result.leaderboard.length,
+                    leaderboard: result.leaderboard.slice(
+                        startIndex,
+                        perPage + startIndex,
+                    ),
+                };
+            }
+            return responseData;
         } catch (error) {
             throw await errorHelpers.transformDatabaseError(
                 error,
@@ -129,8 +188,131 @@ const CategoryCount = {
                 'CategoryCount.getLeaderboardByCategory',
             );
         }
+    },
 
-        return { leaderboard: result, totalEntries };
+    getLeaderboardByTotal: async ({ page, perPage, userId = null }) => {
+        let includeLoggedInUserPipeline = false;
+        if (userId) {
+            includeLoggedInUserPipeline = true;
+        }
+
+        let userObjectId;
+        if (typeof userId === 'string') {
+            userObjectId = new ObjectId(userId);
+        }
+        const startIndex = (page - 1) * perPage;
+
+        console.log(includeLoggedInUserPipeline);
+        const sharedPipelineStages = [
+            { $match: { totalUploads: { $gt: 0 } } },
+            { $sort: { totalUploads: -1 } },
+            {
+                $project: {
+                    itemCount: '$totalUploads',
+                    username: '$displayUsername',
+                    userId: 1,
+                },
+            },
+            { $sort: { itemCount: -1 } },
+            {
+                $group: {
+                    _id: null,
+                    data: { $push: '$$ROOT' },
+                },
+            },
+            {
+                $unwind: {
+                    path: '$data',
+                    includeArrayIndex: 'data.rank',
+                },
+            },
+            { $replaceRoot: { newRoot: '$data' } },
+        ];
+        const pipeline = [
+            {
+                $facet: {
+                    leaderboard: [
+                        ...sharedPipelineStages,
+                        {
+                            $project: {
+                                _id: 0,
+                                username: 1,
+                                itemCount: 1,
+                                rank: { $add: ['$rank', 1] },
+                            },
+                        },
+                    ],
+                    // prettier-ignore
+                    ...(includeLoggedInUserPipeline
+                        ? {
+                            loggedInUser: [
+                                ...sharedPipelineStages,
+                                { $match: { userId: userObjectId } },
+                                {
+                                    $project: {
+                                        _id: 0,
+                                        username: 1,
+                                        itemCount: 1,
+                                        rank: { $add: ['$rank', 1] },
+                                    },
+                                },
+                            ],
+                        }
+                        : {}),
+                },
+            },
+            {
+                $project: {
+                    leaderboard: '$leaderboard',
+                    loggedInUser: { $arrayElemAt: ['$loggedInUser', 0] },
+                },
+            },
+        ];
+
+        try {
+            const [result] = await catCountCollection
+                .aggregate(pipeline)
+                .toArray();
+
+            let responseData;
+            if (result.loggedInUser) {
+                responseData = {
+                    userRank: result.loggedInUser.rank,
+                    totalEntries: result.leaderboard.length,
+                    leaderboard: result.leaderboard.slice(
+                        startIndex,
+                        perPage + startIndex,
+                    ),
+                };
+                // if there isnt a loggedInUser property, the user has no photos for that category
+            } else if (userId) {
+                responseData = {
+                    userRank: -1,
+                    totalEntries: result.leaderboard.length,
+                    leaderboard: result.leaderboard.slice(
+                        startIndex,
+                        perPage + startIndex,
+                    ),
+                };
+                // request was made by a user who is not logged in
+            } else {
+                responseData = {
+                    userRank: null,
+                    totalEntries: result.leaderboard.length,
+                    leaderboard: result.leaderboard.slice(
+                        startIndex,
+                        perPage + startIndex,
+                    ),
+                };
+            }
+            return responseData;
+        } catch (error) {
+            throw await errorHelpers.transformDatabaseError(
+                error,
+                __filename,
+                'CategoryCount.getLeaderboardByTotal',
+            );
+        }
     },
 
     findByUserId: async (_id) => {

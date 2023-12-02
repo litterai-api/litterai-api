@@ -2,13 +2,13 @@ import express from 'express';
 
 import isAuth from '../middleware/isAuth.js';
 
-import authController from '../controllers/auth/index.js';
+import controllers from '../controllers/index.js';
 
 const authRoutes = express.Router();
 
-authRoutes.post('/register', authController.postRegister);
-authRoutes.post('/login', authController.postLogin);
-authRoutes.post('/logout', isAuth, authController.postLogout);
+authRoutes.post('/register', controllers.auth.postRegister);
+authRoutes.post('/login', controllers.auth.postLogin);
+authRoutes.post('/logout', isAuth, controllers.auth.postLogout);
 authRoutes.get('/validate-token', isAuth, (req, res) => {
     res.json({ status: 'success', message: 'Token is valid.' });
 });
