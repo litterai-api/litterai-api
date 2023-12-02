@@ -3,7 +3,6 @@ import {
     getLeaderboardTotalSchema,
 } from './leaderboardReqSchemas.js';
 import CategoryCount from '../../models/CategoryCount.js';
-import leaderboardModel from '../../models/leaderboard/index.js';
 
 const leaderboardController = {
     getLeaderboardByCategory: async (req, res, next) => {
@@ -24,7 +23,6 @@ const leaderboardController = {
                     error: error.details[0].message,
                 });
             }
-            console.log(category, user);
             // Execute service
             const result = await CategoryCount.getLeaderboardByCategory({
                 category,
@@ -59,14 +57,14 @@ const leaderboardController = {
                     error: error.details[0].message,
                 });
             }
-
-            const { code, data } = await leaderboardModel.leaderboardByTotal(
+            console.log(user);
+            const result = await CategoryCount.getLeaderboardByTotal({
                 page,
                 perPage,
-                user,
-            );
+                userId: user?._id,
+            });
 
-            return res.status(code).send(data);
+            return res.status(200).send(result);
         } catch (error) {
             return next(error);
         }

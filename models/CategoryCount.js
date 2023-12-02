@@ -70,58 +70,43 @@ const CategoryCount = {
         }
 
         const startIndex = (page - 1) * perPage;
+        const sharedPipelineStages = [
+            { $match: { [`pictureData.${category}`]: { $gt: 0 } } },
+            {
+                $project: {
+                    itemCount: `$pictureData.${category}`,
+                    username: '$displayUsername',
+                    userId: 1,
+                },
+            },
+            { $sort: { itemCount: -1 } },
+            {
+                $group: {
+                    _id: null,
+                    data: {
+                        $push: '$$ROOT',
+                    },
+                },
+            },
+            {
+                $unwind: {
+                    path: '$data',
+                    includeArrayIndex: 'data.rank',
+                },
+            },
+            { $replaceRoot: { newRoot: '$data' } },
+        ];
 
         const pipeline = [
             {
                 $facet: {
                     // Branch for full leaderboard
                     leaderboard: [
-                        {
-                            $match: {
-                                [`pictureData.${category}`]: { $gt: 0 },
-                            },
-                        },
-                        {
-                            $group: {
-                                _id: '$userId',
-                                itemCount: { $sum: `$pictureData.${category}` },
-                            },
-                        },
-                        {
-                            $lookup: {
-                                from: 'users',
-                                localField: '_id',
-                                foreignField: '_id',
-                                as: 'userInfo',
-                            },
-                        },
-                        { $unwind: '$userInfo' },
+                        ...sharedPipelineStages,
                         {
                             $project: {
-                                userId: '$_id',
                                 _id: 0,
-                                username: '$userInfo.username',
-                                displayUsername: '$userInfo.displayUsername',
-                                itemCount: 1,
-                            },
-                        },
-                        { $sort: { itemCount: -1 } },
-                        {
-                            $group: {
-                                _id: null,
-                                data: { $push: '$$ROOT' },
-                            },
-                        },
-                        {
-                            $unwind: {
-                                path: '$data',
-                                includeArrayIndex: 'data.rank',
-                            },
-                        },
-                        { $replaceRoot: { newRoot: '$data' } },
-                        {
-                            $project: {
-                                username: '$displayUsername',
+                                username: 1,
                                 itemCount: 1,
                                 rank: { $add: ['$rank', 1] },
                             },
@@ -131,54 +116,12 @@ const CategoryCount = {
                     // prettier-ignore
                     ...(includeLoggedInUserPipeline ? {
                         loggedInUser: [
-                            {
-                                $match: {
-                                    [`pictureData.${category}`]: { $gt: 0 },
-                                },
-                            },
-                            {
-                                $group: {
-                                    _id: '$userId',
-                                    itemCount: { $sum: `$pictureData.${category}` },
-                                },
-                            },
-                            {
-                                $lookup: {
-                                    from: 'users',
-                                    localField: '_id',
-                                    foreignField: '_id',
-                                    as: 'userInfo',
-                                },
-                            },
-                            { $unwind: '$userInfo' },
-                            {
-                                $project: {
-                                    userId: '$_id',
-                                    _id: 0,
-                                    username: '$userInfo.username',
-                                    displayUsername: '$userInfo.displayUsername',
-                                    itemCount: 1,
-                                },
-                            },
-                            { $sort: { itemCount: -1 } },
-                            {
-                                $group: {
-                                    _id: null,
-                                    data: { $push: '$$ROOT' },
-                                },
-                            },
-                            {
-                                $unwind: {
-                                    path: '$data',
-                                    includeArrayIndex: 'data.rank',
-                                },
-                            },
-                            { $replaceRoot: { newRoot: '$data' } },
+                            ...sharedPipelineStages,
                             { $match: { userId: userObjectId } },
                             {
                                 $project: {
-                                    username: '$displayUsername',
-                                    totalUploads: 1,
+                                    _id: 0,
+                                    username: 1,
                                     itemCount: 1,
                                     rank: { $add: ['$rank', 1] },
                                 },
@@ -201,12 +144,12 @@ const CategoryCount = {
                 .aggregate(pipeline)
                 .toArray();
 
-            let responseObject = {
+            let responseData = {
                 category,
             };
             if (result.loggedInUser) {
-                responseObject = {
-                    ...responseObject,
+                responseData = {
+                    ...responseData,
                     userRank: result.loggedInUser.rank,
                     totalEntries: result.leaderboard.length,
                     leaderboard: result.leaderboard.slice(
@@ -216,8 +159,8 @@ const CategoryCount = {
                 };
                 // if there isnt a loggedInUser property, the user has no photos for that category
             } else if (userId) {
-                responseObject = {
-                    ...responseObject,
+                responseData = {
+                    ...responseData,
                     userRank: -1,
                     totalEntries: result.leaderboard.length,
                     leaderboard: result.leaderboard.slice(
@@ -227,8 +170,8 @@ const CategoryCount = {
                 };
                 // request was made by a user who is not logged in
             } else {
-                responseObject = {
-                    ...responseObject,
+                responseData = {
+                    ...responseData,
                     userRank: null,
                     totalEntries: result.leaderboard.length,
                     leaderboard: result.leaderboard.slice(
@@ -237,12 +180,137 @@ const CategoryCount = {
                     ),
                 };
             }
-            return responseObject;
+            return responseData;
         } catch (error) {
             throw await errorHelpers.transformDatabaseError(
                 error,
                 __filename,
                 'CategoryCount.getLeaderboardByCategory',
+            );
+        }
+    },
+
+    getLeaderboardByTotal: async ({ page, perPage, userId = null }) => {
+        let includeLoggedInUserPipeline = false;
+        if (userId) {
+            includeLoggedInUserPipeline = true;
+        }
+
+        let userObjectId;
+        if (typeof userId === 'string') {
+            userObjectId = new ObjectId(userId);
+        }
+        const startIndex = (page - 1) * perPage;
+
+        console.log(includeLoggedInUserPipeline);
+        const sharedPipelineStages = [
+            { $match: { totalUploads: { $gt: 0 } } },
+            { $sort: { totalUploads: -1 } },
+            {
+                $project: {
+                    itemCount: '$totalUploads',
+                    username: '$displayUsername',
+                    userId: 1,
+                },
+            },
+            { $sort: { itemCount: -1 } },
+            {
+                $group: {
+                    _id: null,
+                    data: { $push: '$$ROOT' },
+                },
+            },
+            {
+                $unwind: {
+                    path: '$data',
+                    includeArrayIndex: 'data.rank',
+                },
+            },
+            { $replaceRoot: { newRoot: '$data' } },
+        ];
+        const pipeline = [
+            {
+                $facet: {
+                    leaderboard: [
+                        ...sharedPipelineStages,
+                        {
+                            $project: {
+                                _id: 0,
+                                username: 1,
+                                itemCount: 1,
+                                rank: { $add: ['$rank', 1] },
+                            },
+                        },
+                    ],
+                    // prettier-ignore
+                    ...(includeLoggedInUserPipeline
+                        ? {
+                            loggedInUser: [
+                                ...sharedPipelineStages,
+                                { $match: { userId: userObjectId } },
+                                {
+                                    $project: {
+                                        _id: 0,
+                                        username: 1,
+                                        itemCount: 1,
+                                        rank: { $add: ['$rank', 1] },
+                                    },
+                                },
+                            ],
+                        }
+                        : {}),
+                },
+            },
+            {
+                $project: {
+                    leaderboard: '$leaderboard',
+                    loggedInUser: { $arrayElemAt: ['$loggedInUser', 0] },
+                },
+            },
+        ];
+
+        try {
+            const [result] = await catCountCollection
+                .aggregate(pipeline)
+                .toArray();
+
+            let responseData;
+            if (result.loggedInUser) {
+                responseData = {
+                    userRank: result.loggedInUser.rank,
+                    totalEntries: result.leaderboard.length,
+                    leaderboard: result.leaderboard.slice(
+                        startIndex,
+                        perPage + startIndex,
+                    ),
+                };
+                // if there isnt a loggedInUser property, the user has no photos for that category
+            } else if (userId) {
+                responseData = {
+                    userRank: -1,
+                    totalEntries: result.leaderboard.length,
+                    leaderboard: result.leaderboard.slice(
+                        startIndex,
+                        perPage + startIndex,
+                    ),
+                };
+                // request was made by a user who is not logged in
+            } else {
+                responseData = {
+                    userRank: null,
+                    totalEntries: result.leaderboard.length,
+                    leaderboard: result.leaderboard.slice(
+                        startIndex,
+                        perPage + startIndex,
+                    ),
+                };
+            }
+            return responseData;
+        } catch (error) {
+            throw await errorHelpers.transformDatabaseError(
+                error,
+                __filename,
+                'CategoryCount.getLeaderboardByTotal',
             );
         }
     },
