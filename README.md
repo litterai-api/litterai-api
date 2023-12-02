@@ -157,6 +157,7 @@ When `userRank` is `-1` the logged in user has not uploaded a photo of selected 
     ]
 }
 ```
+</details>
 
 ### Get Leaderboard by Category
 
