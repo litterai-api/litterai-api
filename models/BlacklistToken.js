@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 
 const blacklistCollection = getBlacklistCollection;
 
-const BlacklistToken = {
+const blackListToken = {
     addTokenToList: async (token, expires) => {
         try {
             await blacklistCollection.insertOne({
@@ -58,4 +58,4 @@ const BlacklistToken = {
         }
     },
 };
-export default BlacklistToken;
+export default blackListToken;
