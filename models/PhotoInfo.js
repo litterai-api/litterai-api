@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'url';
 import { ObjectId } from 'mongodb';
 import { getUploadInfoCollection } from '../DB/collections.js';
-import CategoryCount from './CategoryCount.js';
+import categoryCount from './CategoryCount.js';
 import errorHelpers from './helpers/errorHelpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -51,7 +51,7 @@ const PhotoInfo = {
         }
         // Update user's category count collection
 
-        const categoryDocument = await CategoryCount.incrementCategoryByUserId(
+        const categoryDocument = await categoryCount.incrementCategoryByUserId(
             categoryString,
             user._id,
             1,

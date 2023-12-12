@@ -4,7 +4,7 @@ import {
     getUserPhotoCountParamSchema,
     postPhotoBodySchema,
 } from './photo-info-req-schemas.js';
-import CategoryCount from '../../models/CategoryCount.js';
+import categoryCount from '../../models/CategoryCount.js';
 import PhotoInfo from '../../models/PhotoInfo.js';
 import logError from '../../Errors/log-error.js';
 
@@ -26,7 +26,7 @@ const photoInfoController = {
             }
 
             const userCategoryCountDoc =
-                await CategoryCount.findByUsername(username);
+                await categoryCount.findByUsername(username);
 
             if (!userCategoryCountDoc) {
                 return res.status(404).send({ message: 'User not found.' });

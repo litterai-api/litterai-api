@@ -8,7 +8,7 @@ import { jest } from '@jest/globals';
 
 import User from '../../models/User.js';
 import PhotoInfo from '../../models/PhotoInfo.js';
-import CategoryCount from '../../models/CategoryCount.js';
+import categoryCount from '../../models/CategoryCount.js';
 import { closeDB } from '../../DB/db-connection.js';
 
 const mocks = {
@@ -112,7 +112,7 @@ describe('User Model', () => {
         db = client.db('testDB');
 
         PhotoInfo.injectDB(db);
-        CategoryCount.injectDB(db);
+        categoryCount.injectDB(db);
         User.injectDB(db);
     });
 
@@ -440,7 +440,7 @@ describe('User Model', () => {
         const sut = User.delete;
         const { getAllUsersPhotoInfo } = PhotoInfo;
         const findUserByEmail = User.findByEmail;
-        const findUserCategoryDocument = CategoryCount.findByUserId;
+        const findUserCategoryDocument = categoryCount.findByUserId;
         let userForDeleteTest;
         beforeAll(async () => {
             const userForDeletePassword = faker.internet.password();

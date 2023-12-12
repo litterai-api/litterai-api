@@ -6,7 +6,7 @@ import { faker } from '@faker-js/faker';
 import { jest } from '@jest/globals';
 
 import PhotoInfo from '../../models/PhotoInfo.js';
-import CategoryCount from '../../models/CategoryCount.js';
+import categoryCount from '../../models/CategoryCount.js';
 import User from '../../models/User.js';
 import { closeDB } from '../../DB/db-connection.js';
 
@@ -69,7 +69,7 @@ describe('PhotoInfo Model', () => {
         db = client.db('testDB');
 
         PhotoInfo.injectDB(db);
-        CategoryCount.injectDB(db);
+        categoryCount.injectDB(db);
         User.injectDB(db);
 
         newUser = await User.create(
@@ -117,13 +117,13 @@ describe('PhotoInfo Model', () => {
         });
 
         it("should have a categoryUpload value that is equal to the CategoryCount document's value", async () => {
-            const actual = await CategoryCount.findByUserId(newUser._id);
+            const actual = await categoryCount.findByUserId(newUser._id);
             const expected = newPhotoCategoryCount;
             expect(actual.pictureData[category]).toEqual(expected);
         });
 
         it("should have a totalUploads value that is equal to the CategoryCount document's value", async () => {
-            const actual = await CategoryCount.findByUserId(newUser._id);
+            const actual = await categoryCount.findByUserId(newUser._id);
             const expected = newPhotoCategoryCount;
             expect(actual.totalUploads).toEqual(expected);
         });

@@ -2,7 +2,7 @@ import { fileURLToPath } from 'url';
 import { ObjectId } from 'mongodb';
 
 import { getUserCollection } from '../DB/collections.js';
-import CategoryCount from './CategoryCount.js';
+import categoryCount from './CategoryCount.js';
 import errorHelpers from './helpers/errorHelpers.js';
 import PhotoInfo from './PhotoInfo.js';
 
@@ -118,7 +118,7 @@ const User = {
         try {
             const userDoc = await usersCollection.insertOne(payload);
             // Create a category count document within CategoryCount Collection
-            await CategoryCount.create(
+            await categoryCount.create(
                 userDoc.insertedId,
                 lowerCaseUsername,
                 trimmedDisplayname,
@@ -158,7 +158,7 @@ const User = {
             }
 
             await PhotoInfo.deleteSingleUsersInfo(_id);
-            await CategoryCount.deleteUserInfo(_id);
+            await categoryCount.deleteUserInfo(_id);
             return user.acknowledged;
         } catch (error) {
             throw await errorHelpers.transformDatabaseError(
