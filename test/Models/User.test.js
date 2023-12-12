@@ -472,7 +472,7 @@ describe('User Model', () => {
 
         it("should delete the selected user's data from all collections", async () => {
             let actual = await findUserByEmail(userForDeleteTest.email);
-            let actualUserPhotos = await getAllUsersPhotoInfo(actual._id);
+            let actualUserPhotos = await getAllUsersPhotoInfo(actual.username);
             expect({ ...actual, _id: actual._id.toHexString() }).toEqual(
                 userForDeleteTest,
             );

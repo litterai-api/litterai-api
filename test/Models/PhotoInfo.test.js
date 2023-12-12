@@ -101,7 +101,7 @@ describe('PhotoInfo Model', () => {
         it('should not return null', async () => {
             const actual = await sut(category, {
                 _id: newUser._id,
-                username: newUser.userName,
+                username: newUser.username,
             });
             newPhotoCategoryCount++;
             expect(actual).not.toBeNull();
@@ -110,7 +110,7 @@ describe('PhotoInfo Model', () => {
         it('should return the same category that was inserted', async () => {
             const actual = await sut(category, {
                 _id: newUser._id,
-                username: newUser.userName,
+                username: newUser.username,
             });
             newPhotoCategoryCount++;
             expect(actual.category).toEqual(category);
@@ -163,14 +163,14 @@ describe('PhotoInfo Model', () => {
         const newUserPhotoArrayLength = 2;
 
         it('should return an array', async () => {
-            let actual = await sut(newUser._id);
+            let actual = await sut(newUser.username);
             expect(actual).toBeInstanceOf(Array);
             actual = await photoInfo.getAllUsersPhotoInfo(22);
             expect(actual).toBeInstanceOf(Array);
         });
 
         it('should return the correct length', async () => {
-            const actual = await sut(newUser._id);
+            const actual = await sut(newUser.username);
             expect(actual).toHaveLength(newUserPhotoArrayLength);
         });
 
@@ -202,11 +202,12 @@ describe('PhotoInfo Model', () => {
             }
         });
     });
+
     describe('deleteSingleUsersInfo', () => {
         const sut = photoInfo.deleteSingleUsersInfo;
         it('should delete all documents in collection for provided userId', async () => {
             const actualBeforeDelete = await photoInfo.getAllUsersPhotoInfo(
-                newUser._id,
+                newUser.username,
             );
             expect(actualBeforeDelete.length).toBeGreaterThan(0);
             // Delete documents
