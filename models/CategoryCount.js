@@ -1,8 +1,7 @@
 import { fileURLToPath } from 'url';
 import { ObjectId } from 'mongodb';
-import { getCatCountCollection } from '../DB/collections.js';
+import { getCatCountCollection, getUserCollection } from '../DB/collections.js';
 import errorHelpers from './helpers/errorHelpers.js';
-import User from './User.js';
 
 const __filename = fileURLToPath(import.meta.url);
 /**
@@ -11,10 +10,13 @@ const __filename = fileURLToPath(import.meta.url);
 let catCountCollection =
     process.env.NODE_ENV !== 'test' && getCatCountCollection;
 
-const CategoryCount = {
+let userCollection = process.env.NODE_ENV !== 'test' && getUserCollection;
+
+const categoryCount = {
     injectDB: (db) => {
         if (process.env.NODE_ENV === 'test') {
             catCountCollection = db.collection('categoryCounts');
+            userCollection = db.collection('users');
         }
     },
 
@@ -165,7 +167,11 @@ const CategoryCount = {
                 };
                 // if there isnt a loggedInUser property, the user has no photos for that category
             } else if (userId) {
-                const userInfo = await User.findById(userId);
+                const userInfo = await userCollection.findOne({
+                    _id: userObjectId,
+                });
+
+                console.log(userInfo);
 
                 responseData = {
                     ...responseData,
@@ -298,7 +304,9 @@ const CategoryCount = {
                 };
                 // if there isnt a loggedInUser property, the user has no photos for that category
             } else if (userId) {
-                const userInfo = await User.findById(userId);
+                const userInfo = await userCollection.findOne({
+                    _id: userObjectId,
+                });
                 responseData = {
                     ...responseData,
                     username: userInfo.displayUsername,
@@ -425,4 +433,4 @@ const CategoryCount = {
     },
 };
 
-export default CategoryCount;
+export default categoryCount;
