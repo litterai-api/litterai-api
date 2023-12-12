@@ -73,15 +73,10 @@ const PhotoInfo = {
         };
     },
 
-    getAllUsersPhotoInfo: async (userId) => {
-        let userObjectId;
+    getAllUsersPhotoInfo: async (username) => {
         try {
-            if (typeof userId === 'string') {
-                userObjectId = new ObjectId(userId);
-            }
-
             const results = await photoInfoCollection
-                .find({ userId: userObjectId || userId })
+                .find({ username })
                 .toArray();
             return results || [];
         } catch (error) {
