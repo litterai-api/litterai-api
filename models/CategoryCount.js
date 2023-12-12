@@ -171,8 +171,6 @@ const categoryCount = {
                     _id: userObjectId,
                 });
 
-                console.log(userInfo);
-
                 responseData = {
                     ...responseData,
                     username: userInfo.displayUsername,
@@ -212,7 +210,6 @@ const categoryCount = {
         }
         const startIndex = (page - 1) * perPage;
 
-        console.log(includeLoggedInUserPipeline);
         const sharedPipelineStages = [
             { $match: { totalUploads: { $gt: 0 } } },
             { $sort: { totalUploads: -1 } },
