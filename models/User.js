@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 
 let usersCollection = getUserCollection;
 
-const User = {
+const userModel = {
     injectDB: (db) => {
         if (process.env.NODE_ENV === 'test') {
             usersCollection = db.collection('users');
@@ -86,8 +86,8 @@ const User = {
         }
 
         if (
-            (await User.findByEmail(email)) ||
-            (await User.findByUsername(displayUsername.toLowerCase()))
+            (await userModel.findByEmail(email)) ||
+            (await userModel.findByUsername(displayUsername.toLowerCase()))
         ) {
             const error = new Error('Username or Email already in use');
             error.statusCode = 409;
@@ -170,4 +170,4 @@ const User = {
     },
 };
 
-export default User;
+export default userModel;

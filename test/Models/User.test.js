@@ -6,7 +6,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { faker } from '@faker-js/faker';
 import { jest } from '@jest/globals';
 
-import User from '../../models/User.js';
+import userModel from '../../models/User.js';
 import photoInfo from '../../models/PhotoInfo.js';
 import categoryCount from '../../models/CategoryCount.js';
 import { closeDB } from '../../DB/db-connection.js';
@@ -113,7 +113,7 @@ describe('User Model', () => {
 
         photoInfo.injectDB(db);
         categoryCount.injectDB(db);
-        User.injectDB(db);
+        userModel.injectDB(db);
     });
 
     afterAll(async () => {
@@ -127,7 +127,7 @@ describe('User Model', () => {
     });
 
     describe('create', () => {
-        const sut = User.create;
+        const sut = userModel.create;
         const users = [
             {
                 displayUsername: faker.internet.userName(),
@@ -293,7 +293,7 @@ describe('User Model', () => {
             const createdUserPassword = faker.internet.password();
             createdUsers = await Promise.all(
                 dummyUsers.map(async (dummyUser) => {
-                    const createdUser = await User.create(
+                    const createdUser = await userModel.create(
                         dummyUser.displayUsername,
                         dummyUser.email,
                         createdUserPassword,
@@ -311,7 +311,7 @@ describe('User Model', () => {
             );
         });
         describe('findByEmail', () => {
-            const sut = User.findByEmail;
+            const sut = userModel.findByEmail;
             it('should find a user by email', async () => {
                 for (const user of createdUsers) {
                     const actual = await sut(user.email);
@@ -345,7 +345,7 @@ describe('User Model', () => {
         });
 
         describe('findById', () => {
-            const sut = User.findById;
+            const sut = userModel.findById;
             it('should find a user by id as an ObjectId', async () => {
                 for (const user of createdUsers) {
                     const actual = await sut(user._id);
@@ -387,7 +387,7 @@ describe('User Model', () => {
         });
 
         describe('findByUsername', () => {
-            const sut = User.findByUsername;
+            const sut = userModel.findByUsername;
             it('should find a user by username', async () => {
                 for (const user of createdUsers) {
                     const actual = await sut(user.username);
@@ -437,14 +437,14 @@ describe('User Model', () => {
         });
     });
     describe('delete', () => {
-        const sut = User.delete;
+        const sut = userModel.delete;
         const { getAllUsersPhotoInfo } = photoInfo;
-        const findUserByEmail = User.findByEmail;
+        const findUserByEmail = userModel.findByEmail;
         const findUserCategoryDocument = categoryCount.findByUserId;
         let userForDeleteTest;
         beforeAll(async () => {
             const userForDeletePassword = faker.internet.password();
-            userForDeleteTest = await User.create(
+            userForDeleteTest = await userModel.create(
                 faker.internet.userName(),
                 faker.internet.email(),
                 userForDeletePassword,

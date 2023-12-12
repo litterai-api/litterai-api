@@ -7,7 +7,7 @@ import { jest } from '@jest/globals';
 
 import photoInfo from '../../models/PhotoInfo.js';
 import categoryCount from '../../models/CategoryCount.js';
-import User from '../../models/User.js';
+import userModel from '../../models/User.js';
 import { closeDB } from '../../DB/db-connection.js';
 
 const getRandomCategory = () => {
@@ -70,9 +70,9 @@ describe('PhotoInfo Model', () => {
 
         photoInfo.injectDB(db);
         categoryCount.injectDB(db);
-        User.injectDB(db);
+        userModel.injectDB(db);
 
-        newUser = await User.create(
+        newUser = await userModel.create(
             faker.internet.userName(),
             faker.internet.email(),
             faker.internet.password(),
@@ -83,7 +83,7 @@ describe('PhotoInfo Model', () => {
     });
 
     afterAll(async () => {
-        await User.delete(newUser._id);
+        await userModel.delete(newUser._id);
         await closeDB();
         await client.close();
         await mongoServer.stop();
