@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { getUserCollection } from '../DB/collections.js';
 import categoryCount from './CategoryCount.js';
 import errorHelpers from './helpers/errorHelpers.js';
-import PhotoInfo from './PhotoInfo.js';
+import photoInfo from './PhotoInfo.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -157,7 +157,7 @@ const User = {
                 return false;
             }
 
-            await PhotoInfo.deleteSingleUsersInfo(_id);
+            await photoInfo.deleteSingleUsersInfo(_id);
             await categoryCount.deleteUserInfo(_id);
             return user.acknowledged;
         } catch (error) {

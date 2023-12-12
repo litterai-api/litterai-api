@@ -5,7 +5,7 @@ import {
     postPhotoBodySchema,
 } from './photo-info-req-schemas.js';
 import categoryCount from '../../models/CategoryCount.js';
-import PhotoInfo from '../../models/PhotoInfo.js';
+import photoInfo from '../../models/PhotoInfo.js';
 import logError from '../../Errors/log-error.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -55,7 +55,7 @@ const photoInfoController = {
                 return res.status(401).send({ message: 'Invalid email.' });
             }
 
-            const result = await PhotoInfo.insertOne(category, req.user);
+            const result = await photoInfo.insertOne(category, req.user);
 
             return res.status(201).send(result);
         } catch (error) {

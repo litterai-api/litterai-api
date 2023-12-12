@@ -7,7 +7,7 @@ import { faker } from '@faker-js/faker';
 import { jest } from '@jest/globals';
 
 import User from '../../models/User.js';
-import PhotoInfo from '../../models/PhotoInfo.js';
+import photoInfo from '../../models/PhotoInfo.js';
 import categoryCount from '../../models/CategoryCount.js';
 import { closeDB } from '../../DB/db-connection.js';
 
@@ -111,7 +111,7 @@ describe('User Model', () => {
         await client.connect();
         db = client.db('testDB');
 
-        PhotoInfo.injectDB(db);
+        photoInfo.injectDB(db);
         categoryCount.injectDB(db);
         User.injectDB(db);
     });
@@ -438,7 +438,7 @@ describe('User Model', () => {
     });
     describe('delete', () => {
         const sut = User.delete;
-        const { getAllUsersPhotoInfo } = PhotoInfo;
+        const { getAllUsersPhotoInfo } = photoInfo;
         const findUserByEmail = User.findByEmail;
         const findUserCategoryDocument = categoryCount.findByUserId;
         let userForDeleteTest;
@@ -459,11 +459,11 @@ describe('User Model', () => {
             };
 
             await Promise.all([
-                PhotoInfo.insertOne('trash', {
+                photoInfo.insertOne('trash', {
                     _id: userForDeleteTest._id,
                     username: userForDeleteTest.username,
                 }),
-                PhotoInfo.insertOne('plastic', {
+                photoInfo.insertOne('plastic', {
                     _id: userForDeleteTest._id,
                     username: userForDeleteTest.username,
                 }),
@@ -478,7 +478,7 @@ describe('User Model', () => {
             );
             expect(actualUserPhotos).toHaveLength(2);
             actual = await sut(actual._id);
-            actualUserPhotos = await PhotoInfo.getAllUsersPhotoInfo(
+            actualUserPhotos = await photoInfo.getAllUsersPhotoInfo(
                 userForDeleteTest._id,
             );
 

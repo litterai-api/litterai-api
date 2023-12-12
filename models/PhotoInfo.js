@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
  */
 let photoInfoCollection = getUploadInfoCollection;
 
-const PhotoInfo = {
+const photoInfo = {
     injectDB: (db) => {
         if (process.env.NODE_ENV === 'test') {
             photoInfoCollection = db.collection('uploadsinfo');
@@ -102,4 +102,4 @@ const PhotoInfo = {
     },
 };
 
-export default PhotoInfo;
+export default photoInfo;

@@ -5,7 +5,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { faker } from '@faker-js/faker';
 import { jest } from '@jest/globals';
 
-import PhotoInfo from '../../models/PhotoInfo.js';
+import photoInfo from '../../models/PhotoInfo.js';
 import categoryCount from '../../models/CategoryCount.js';
 import User from '../../models/User.js';
 import { closeDB } from '../../DB/db-connection.js';
@@ -68,7 +68,7 @@ describe('PhotoInfo Model', () => {
         await client.connect();
         db = client.db('testDB');
 
-        PhotoInfo.injectDB(db);
+        photoInfo.injectDB(db);
         categoryCount.injectDB(db);
         User.injectDB(db);
 
@@ -94,7 +94,7 @@ describe('PhotoInfo Model', () => {
     });
 
     describe('insertOne', () => {
-        const sut = PhotoInfo.insertOne;
+        const sut = photoInfo.insertOne;
         const category = getRandomCategory();
         let newPhotoCategoryCount = 0;
 
@@ -130,7 +130,7 @@ describe('PhotoInfo Model', () => {
 
         it('should throw an error if an invalid userId is entered', async () => {
             await expect(
-                PhotoInfo.insertOne(category, {
+                photoInfo.insertOne(category, {
                     _id: 22,
                     username: 'error',
                 }),
@@ -159,13 +159,13 @@ describe('PhotoInfo Model', () => {
     });
 
     describe('getAllUsersPhotoInfo', () => {
-        const sut = PhotoInfo.getAllUsersPhotoInfo;
+        const sut = photoInfo.getAllUsersPhotoInfo;
         const newUserPhotoArrayLength = 2;
 
         it('should return an array', async () => {
             let actual = await sut(newUser._id);
             expect(actual).toBeInstanceOf(Array);
-            actual = await PhotoInfo.getAllUsersPhotoInfo(22);
+            actual = await photoInfo.getAllUsersPhotoInfo(22);
             expect(actual).toBeInstanceOf(Array);
         });
 
@@ -203,15 +203,15 @@ describe('PhotoInfo Model', () => {
         });
     });
     describe('deleteSingleUsersInfo', () => {
-        const sut = PhotoInfo.deleteSingleUsersInfo;
+        const sut = photoInfo.deleteSingleUsersInfo;
         it('should delete all documents in collection for provided userId', async () => {
-            const actualBeforeDelete = await PhotoInfo.getAllUsersPhotoInfo(
+            const actualBeforeDelete = await photoInfo.getAllUsersPhotoInfo(
                 newUser._id,
             );
             expect(actualBeforeDelete.length).toBeGreaterThan(0);
             // Delete documents
             await sut(newUser._id);
-            const actualAfterDelete = await PhotoInfo.getAllUsersPhotoInfo(
+            const actualAfterDelete = await photoInfo.getAllUsersPhotoInfo(
                 newUser._id,
             );
             expect(actualAfterDelete).toHaveLength(0);
