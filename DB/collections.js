@@ -13,34 +13,34 @@ let categoryCountCollection;
 let blacklistCollection;
 
 const getCollection = async (collectionName, collection) => {
-  if (collection) {
-    return collection;
-  }
-  try {
-    const db = await getDb();
-    collection = await db.collection(collectionName);
-    return collection;
-  } catch (error) {
-    logError(
-      error,
-      __filename,
-      'getCollection',
-      `Failed connecting to ${collectionName}`,
-    );
-    console.log(error);
-  }
+    if (collection) {
+        return collection;
+    }
+    try {
+        const db = await getDb();
+        collection = await db.collection(collectionName);
+        return collection;
+    } catch (error) {
+        logError(
+            error,
+            __filename,
+            'getCollection',
+            `Failed connecting to ${collectionName}`,
+        );
+        console.log(error);
+    }
 };
 
 export const getUserCollection = await getCollection('users', userCollection);
 export const getUploadInfoCollection = await getCollection(
-  'uploadsinfo',
-  uploadCollection,
+    'uploadsinfo',
+    uploadCollection,
 );
 export const getCatCountCollection = await getCollection(
-  'categoryCounts',
-  categoryCountCollection,
+    'categoryCounts',
+    categoryCountCollection,
 );
 export const getBlacklistCollection = await getCollection(
-  'blacklistTokens',
-  blacklistCollection,
+    'blacklistTokens',
+    blacklistCollection,
 );
