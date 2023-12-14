@@ -136,6 +136,7 @@ describe('User Model', () => {
                 firstName: faker.person.firstName(),
                 lastName: faker.person.lastName(),
                 zipCode: faker.location.zipCode('#####'),
+                status: 'pending',
             },
             {
                 displayUsername: faker.internet.userName(),
@@ -144,6 +145,7 @@ describe('User Model', () => {
                 firstName: faker.person.firstName(),
                 lastName: faker.person.lastName(),
                 zipCode: faker.location.zipCode('#####'),
+                status: 'pending',
             },
             {
                 displayUsername: faker.internet.userName(),
@@ -152,6 +154,7 @@ describe('User Model', () => {
                 firstName: faker.person.firstName(),
                 lastName: faker.person.lastName(),
                 zipCode: faker.location.zipCode('#####'),
+                status: 'pending',
             },
             {
                 displayUsername: faker.internet.userName(),
@@ -160,6 +163,7 @@ describe('User Model', () => {
                 firstName: faker.person.firstName(),
                 lastName: faker.person.lastName(),
                 zipCode: faker.location.zipCode('#####'),
+                status: 'pending',
             },
         ];
 
@@ -171,6 +175,7 @@ describe('User Model', () => {
                 user.firstName,
                 user.lastName,
                 user.zipCode,
+                user.status,
             );
 
             const expected = {
@@ -181,6 +186,7 @@ describe('User Model', () => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 zipCode: user.zipCode,
+                status: user.pending,
             };
             expect(actual).not.toBeNull();
             expect(actual).not.toHaveProperty('password');

@@ -1,10 +1,21 @@
 # litterai-api
 
+## .env Contents
+
+```
+SERVER_PORT=<number>
+MONGO_URI=<MongoDB URI>  // example:'mongodb://localhost:27017'
+REFRESH_SECRET=<string>
+ACCESS_SECRET=<string>
+
+```
+
 ## Authorization Endpoints
 
 ### Register User
 
-This endpoint will create a user document and a photo category document which stores the value of each category of trash determined by the AI based on the photo uploaded by the user.
+This endpoint will create a user document and a photo category document which
+stores the value of each category of trash determined by the AI based on the photo uploaded by the user.
 
 **POST** `/register`
 
@@ -80,10 +91,10 @@ JSON Request body should follow
 Include user's JWT in an authorization header
 
 ```
-Authorization: Bearer <token>
+"Authorization": "Bearer <token>"
 ```
 
-## Leaderboard endpoints
+## Photo Info endpoints
 
 ### Add Photo info
 
@@ -94,8 +105,10 @@ After a photo has had its contents parsed by the AI send a request to this endpo
 Include user's JWT in an authorization header
 
 ```
-Authorization: Bearer <token>
+"Authorization": "Bearer <token>"
 ```
+
+Valid Categories: `"paper"`, `"cardboard"`, `"compost"`, `"metal"`, `"glass"`, `"plastic"`, `"trash"`, `"other"`, `"unknown"`
 
 JSON Request body should follow
 
@@ -120,9 +133,47 @@ JSON Request body should follow
 
 </details>
 
+### Get user's photos count
+
+**GET** `/photo/:username`
+
+Include user's JWT in an authorization header
+
+```
+"Authorization": "Bearer <token>"
+```
+
+<details>
+<summary>Response</summary>
+
+```
+{
+    "_id": <string>,
+    "userId": <string>,
+    "username": <string>,
+    "displayUsername": <string>,
+    "pictureData": {
+        "paper": <number>,
+        "cardboard": <number>,
+        "compost": <number>,
+        "metal": <number>,
+        "glass": <number>,
+        "plastic": <number>,
+        "trash": <number>,
+        "other": <number>,
+        "unknown": <number>,
+    },
+    "totalUploads": <number>
+}
+```
+
+</details>
+
+## Leaderboard endpoints
+
 ### Get Leaderboard by Total Uploads
 
-Returns a json object that contains a category, the logged in user's rank,
+Returns a json object that contains a leaderboard, and information about the logged in user if possible.
 
 **GET** `/leaderboard`
 
@@ -145,8 +196,10 @@ When `userRank` is `-1` the logged in user has not uploaded a photo of selected 
 ```
 {
     "category": <string>,
-    "userRank": <number>,
     "totalEntries": <number>,
+    "username": <string>,
+    "userRank": <number>,
+    "userItemCount": <number>
     "leaderboard": [
         {
             "username": <string>,
@@ -157,13 +210,16 @@ When `userRank` is `-1` the logged in user has not uploaded a photo of selected 
     ]
 }
 ```
+
 </details>
 
 ### Get Leaderboard by Category
 
-Returns a json object that contains a category, the logged in user's rank,
+Returns a json object that contains a category, a leaderboard, and information about the logged in user if possible.
 
 **GET** `/leaderboard/:category`
+
+Valid Categories: `"paper"`, `"cardboard"`, `"compost"`, `"metal"`, `"glass"`, `"plastic"`, `"trash"`, `"other"`, `"unknown"`
 
 **Query Params**
 
@@ -184,8 +240,10 @@ When `userRank` is `-1` the logged in user has not uploaded a photo of selected 
 ```
 {
     "category": <string>,
-    "userRank": <number>,
     "totalEntries": <number>,
+    "username": <string>,
+    "userRank": <number>,
+    "userItemCount": <number>
     "leaderboard": [
         {
             "username": <string>,

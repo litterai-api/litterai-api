@@ -1,7 +1,9 @@
 import 'dotenv/config';
+import cookieParser from 'cookie-parser';
 import express from 'express';
 import morgan from 'morgan';
 import { fileURLToPath } from 'url';
+import cors from 'cors';
 
 import { getDb, mongoConnect } from './DB/db-connection.js';
 import routes from './routes/index.js';
@@ -11,7 +13,8 @@ import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
-const { JWT_SECRET, MONGO_URI, SERVER_PORT, NODE_ENV } = process.env;
+const { REFRESH_SECRET, ACCESS_SECRET, MONGO_URI, SERVER_PORT, NODE_ENV } =
+    process.env;
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -22,12 +25,14 @@ const startServer = async () => {
         await mongoConnect();
         const db = await getDb();
 
+        app.use(cors());
         app.use(morgan('dev'));
         app.use(express.json());
         app.use(express.urlencoded({ extended: true }));
+        app.use(cookieParser());
 
         app.use((req, res, next) => {
-            if (!JWT_SECRET || !MONGO_URI) {
+            if (!REFRESH_SECRET || !MONGO_URI || !ACCESS_SECRET) {
                 return res.status(500).send({
                     message: 'Internal Service Error',
                     error: 'Server missing Database Connection String or Secret',
