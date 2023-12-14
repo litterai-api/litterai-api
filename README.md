@@ -6,6 +6,7 @@
 SERVER_PORT=<number>
 MONGO_URI=<MongoDB URI>  // example:'mongodb://localhost:27017'
 REFRESH_SECRET=<string>
+ACCESS_SECRET=<string>
 
 ```
 

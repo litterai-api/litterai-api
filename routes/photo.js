@@ -1,12 +1,12 @@
 import express from 'express';
 
-import photoController from '../controllers/photo-upload/index.js';
-import getUserPhotoCount from '../controllers/photo-upload/get-user-photo-count.js';
+import controllers from '../controllers/index.js';
+import isAuth from '../middleware/isAuth.js';
 
 const photoRoutes = express.Router();
 
-photoRoutes.post('/', photoController.postPhoto);
+photoRoutes.post('/', isAuth, controllers.photoInfo.postPhoto);
 
-photoRoutes.get('/:username', getUserPhotoCount);
+photoRoutes.get('/:username', isAuth, controllers.photoInfo.getUserPhotoCount);
 
 export default photoRoutes;
